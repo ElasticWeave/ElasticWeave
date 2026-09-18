@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use ElasticWeave in your research, please cite it as below."
+type: software
+title: "ElasticWeave"
+authors:
+  - family-names: "Li"
+    given-names: "Muheng"
+    affiliation: "Tsinghua University"
+url: "https://github.com/ElasticWeave/ElasticWeave"
+repository-code: "https://github.com/ElasticWeave/ElasticWeave"
