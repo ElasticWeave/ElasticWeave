@@ -1,0 +1,56 @@
+{
+  "bundledDefault": {
+    "approvalSequence": [
+      "approve-v1",
+      "run-v1-while-slot-is-replaced",
+      "approve-v2",
+      "run-v2"
+    ],
+    "cycleCount": 2,
+    "loader": "hmz.runner.Runner -> bundled default.py -> hmz.flows.load -> approved slot",
+    "modelCalls": 0,
+    "result": {
+      "task": "bundled default pinned loader smoke",
+      "terminal": "COMPLETE",
+      "versions": [
+        "approved-v1-start",
+        "approved-v1-end",
+        "approved-v2"
+      ]
+    },
+    "turns": 0
+  },
+  "commitments": {
+    "approvedSlotOneSha256": "a8fd803f933a7ac5c6ae3ea1d391c3afe00ceb244517dc9b1662baf972f985b7",
+    "approvedSlotTwoSha256": "cc7286d388a0e19a33b348d618517fa3ab7c5ca0ee580bb10f059106e82cbfc9",
+    "bundledDefaultSha256": "4649c77470f0eed20e68443483abc39acdf358b22dca7caa7fa16c4e4da8f743",
+    "bundledProbeSha256": "835776a29100b743e72c6b404ef9739d31f0ff485343eacf67525caf9d11d4d7",
+    "bundledSeedSlotSha256": "ada28c32b9c687bd11952e94712d9f533ebe0461a3a362584e9704ca07c99037",
+    "contractSha256": "0d871e1143190a88b46f41eeb2a9dea485318896e4c0051a80868a931b366a87",
+    "flowSha256": "4209dde6132acb00f1476a15a394231861d7f608f92c173d0418c6d3d0b3e6eb",
+    "flowValidatorSha256": "6f24de0b620525befd366e835c6361112c5cea361f5eb629b9d30ae8225fea07",
+    "slotOneSha256": "c439bce9f611551fee939e191679063c71f6a41ffd80297a82e8ed61792e90f0",
+    "slotTwoSha256": "fc5149e57cc21acbac9db54ee14d335a3c45adf9f1be9af8c02c6daa4e5b3945"
+  },
+  "cycleCount": 1,
+  "integration": true,
+  "modelCalls": 0,
+  "repository": "https://github.com/humanfia/humanize2.git",
+  "result": {
+    "task": "safe deterministic smoke",
+    "terminal": "COMPLETE",
+    "versions": [
+      "v1",
+      "v2",
+      "v2",
+      "v1-start",
+      "v1-end",
+      "v2"
+    ]
+  },
+  "revision": "8fbb2b718d74b7ef1d3d0650a9768415ec489f26",
+  "schema": "humanize2-smoke-receipt/v3",
+  "status": "ok",
+  "terminal": "COMPLETE",
+  "version": "hmz 0.1.0"
+}

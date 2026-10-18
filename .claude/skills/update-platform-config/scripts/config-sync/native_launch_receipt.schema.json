@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://humanfia.example/schemas/workflow-native-launch-receipt-v1.json",
+  "title": "Explicit native model launch receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "request", "resolved", "writer", "policy", "receiptSha256"],
+  "properties": {
+    "schema": {"const": "workflow-native-launch-receipt/v1"},
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["taskClass", "reasoningPosture", "semanticRole", "writerRole", "reviewMode"],
+      "properties": {
+        "taskClass": {"type": "string", "minLength": 1},
+        "reasoningPosture": {"enum": ["economy", "balanced", "frontier"]},
+        "semanticRole": {"type": "string", "minLength": 1},
+        "writerRole": {"type": ["string", "null"]},
+        "reviewMode": {"enum": ["none", "exact-opposite"]}
+      }
+    },
+    "resolved": {"$ref": "#/$defs/identity"},
+    "writer": {"oneOf": [{"type": "null"}, {"$ref": "#/$defs/identity"}]},
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "modelsSchema",
+        "modelsDocumentSha256",
+        "catalogResolutionSha256",
+        "capabilityPolicySha256",
+        "reasoningPolicySha256",
+        "catalogStatus",
+        "catalogSource",
+        "catalogEvidenceReceipt",
+        "liveCatalogAuthenticatedByResolver",
+        "freshCatalogEvidence"
+      ],
+      "properties": {
+        "modelsSchema": {"const": "workflow-model-roles/v3"},
+        "modelsDocumentSha256": {"$ref": "#/$defs/sha256"},
+        "catalogResolutionSha256": {"$ref": "#/$defs/sha256"},
+        "capabilityPolicySha256": {"$ref": "#/$defs/sha256"},
+        "reasoningPolicySha256": {"$ref": "#/$defs/sha256"},
+        "catalogStatus": {"enum": ["bootstrap-unverified", "verified"]},
+        "catalogSource": {"const": "authenticated-native-cli"},
+        "catalogEvidenceReceipt": {"type": ["object", "null"]},
+        "liveCatalogAuthenticatedByResolver": {"const": true},
+        "freshCatalogEvidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "patternProperties": {
+            "^(claude|codex|cursor)$": {"$ref": "#/$defs/catalogEvidence"}
+          }
+        }
+      }
+    },
+    "receiptSha256": {"$ref": "#/$defs/sha256"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semanticRole",
+        "backend",
+        "provider",
+        "upstreamProviderFamily",
+        "model",
+        "modelFamily",
+        "effort",
+        "intelligenceClass",
+        "dispatchStatus",
+        "catalogModelId"
+      ],
+      "properties": {
+        "semanticRole": {"type": "string", "minLength": 1},
+        "backend": {"type": "string", "minLength": 1},
+        "provider": {"type": "string", "minLength": 1},
+        "upstreamProviderFamily": {"type": "string", "minLength": 1},
+        "model": {"type": "string", "minLength": 1},
+        "modelFamily": {"type": "string", "minLength": 1},
+        "effort": {"type": "string", "minLength": 1},
+        "intelligenceClass": {"type": "string", "minLength": 1},
+        "dispatchStatus": {"const": "active"},
+        "catalogModelId": {"type": "string", "minLength": 1}
+      }
+    },
+    "catalogEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["backend", "command", "catalogBytesSha256", "exitCode", "stderrSha256", "coverage"],
+      "properties": {
+        "backend": {"type": "string", "minLength": 1},
+        "command": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "argv",
+            "executable",
+            "executableSha256",
+            "invokedArgv",
+            "executionClosure",
+            "executionClosureSha256"
+          ],
+          "properties": {
+            "argv": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+            "executable": {"type": "string", "minLength": 1},
+            "executableSha256": {"$ref": "#/$defs/sha256"},
+            "invokedArgv": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+            "executionClosure": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["role", "path", "sha256"],
+                "properties": {
+                  "role": {"enum": ["interpreter", "entrypoint", "runtime", "bundle"]},
+                  "path": {"type": "string", "minLength": 1},
+                  "sha256": {"$ref": "#/$defs/sha256"}
+                }
+              }
+            },
+            "executionClosureSha256": {"$ref": "#/$defs/sha256"}
+          }
+        },
+        "catalogBytesSha256": {"$ref": "#/$defs/sha256"},
+        "exitCode": {"const": 0},
+        "stderrSha256": {"$ref": "#/$defs/sha256"},
+        "coverage": {"type": "object"}
+      }
+    }
+  }
+}

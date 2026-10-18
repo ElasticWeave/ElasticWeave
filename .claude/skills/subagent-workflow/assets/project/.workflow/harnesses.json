@@ -1,0 +1,64 @@
+{
+  "schema": "workflow-harness-registry/v1",
+  "default": "subagent-scheduler",
+  "harnesses": {
+    "subagent-scheduler": {
+      "reviewPolicies": ["independent", "machine-gated"],
+      "skill": "subagent-workflow",
+      "artifact": ".subagent/flows/<design-id>.json",
+      "install": "built-in",
+      "commands": {
+        "check": "bun --version",
+        "ensure": "bun --version",
+        "validate": "bun .claude/skills/subagent-workflow/scripts/controller/run.ts validate <artifact>",
+        "run": "GENERAL_AGENT_ALLOW_PROTECTED_WRITE=1 bun .claude/skills/subagent-workflow/scripts/controller/run.ts start <artifact>",
+        "finalize": "GENERAL_AGENT_ALLOW_PROTECTED_WRITE=1 bun .claude/skills/subagent-workflow/scripts/controller/run.ts finalize-only <artifact> --resume <run-dir>"
+      },
+      "capabilities": {
+        "agent-invocation": "adapter-native-cli",
+        "fresh-sessions": "adapter-native-invocation",
+        "interrupted-session-resume": "adapter-native-same-session",
+        "persistent-sessions": "not-supported-cross-node-v1",
+        "stateful-continuation": "adapter-atomic-checkpoint",
+        "node-skill-loading": "adapter-prompt-materialization",
+        "conditional-routing": "adapter-controller",
+        "structured-output": "adapter-fail-closed-parser",
+        "bounded-loops": "not-supported-v1",
+        "fanout-fanin": "adapter-frontier-and-wait-for",
+        "durable-checkpoints": "adapter-atomic-checkpoint",
+        "observability": "adapter-jsonl-journal",
+        "machine-gated-review": "adapter-verdict-routes-and-cross-provider-review",
+        "state-bound-proof": "adapter-state-and-byte-bound-finalization"
+      }
+    },
+    "humanize": {
+      "enabled": true,
+      "reviewPolicies": ["independent"],
+      "skill": "humanize-workflow",
+      "artifact": ".humanize/mappings/<design-id>.json",
+      "install": "lazy-pinned-isolated-venv",
+      "commands": {
+        "check": "python3 .claude/skills/humanize-workflow/scripts/ensure_humanize.py --check",
+        "ensure": "python3 .claude/skills/humanize-workflow/scripts/ensure_humanize.py --install",
+        "validate": "python3 .claude/skills/humanize-workflow/scripts/validate_mapping.py <artifact>",
+        "run": "python3 .claude/skills/humanize-workflow/scripts/run_mapping.py <artifact> --hmz <reported-binary>"
+      },
+      "capabilities": {
+        "agent-invocation": "native",
+        "fresh-sessions": "adapter-generated-distinct-agent-per-node",
+        "interrupted-session-resume": "not-supported-v1",
+        "persistent-sessions": "not-supported-v1",
+        "stateful-continuation": "not-supported-v1",
+        "node-skill-loading": "not-supported-v1",
+        "conditional-routing": "adapter-generated-finite-verdict-routes",
+        "structured-output": "adapter-pydantic-extra-forbid",
+        "bounded-loops": "not-supported-v1",
+        "fanout-fanin": "not-supported-v1",
+        "durable-checkpoints": "not-supported-v1",
+        "observability": "native-cycle-plus-adapter-result",
+        "machine-gated-review": "not-supported-v1",
+        "state-bound-proof": "not-supported-v1"
+      }
+    }
+  }
+}

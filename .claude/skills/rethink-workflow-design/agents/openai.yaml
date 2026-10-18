@@ -1,0 +1,4 @@
+interface:
+  display_name: "Rethink Workflow Design"
+  short_description: "Rethink workflow search and iteration policy"
+  default_prompt: "Use $rethink-workflow-design to audit this workflow, its autonomous or human_guided iteration policy, review compression, and plateau behavior, then propose evidence-backed alternatives."

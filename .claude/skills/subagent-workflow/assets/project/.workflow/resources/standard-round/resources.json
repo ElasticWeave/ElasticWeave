@@ -1,0 +1,105 @@
+{
+  "schema": "workflow-resource-closure/v1",
+  "workflow": "standard-round",
+  "designPath": ".workflow/designs/standard-round.workflow.json",
+  "designSha256": "5dfecfa9ffdb430a7dfe083b78c42029d10416f2a79d467fe96253474fc06992",
+  "files": [
+    {
+      "label": "mapping-builder",
+      "path": ".workflow/resources/standard-round/build_mapping.mjs",
+      "sha256": "c1fe6a31c88202fb86d3bfefc175db9d11f9864e25dd1a429372c552e1d137f6",
+      "purpose": "mapping construction and semantic check"
+    },
+    {
+      "label": "prompt-implement",
+      "path": ".workflow/resources/standard-round/prompts/implement.md",
+      "sha256": "0c4ca9d3aca98825d9e31e9419f9c04ac59e59905df24a39b3de3d4faac44c2e",
+      "purpose": "implementation nodes"
+    },
+    {
+      "label": "prompt-reward",
+      "path": ".workflow/resources/standard-round/prompts/reward-hacking-review.md",
+      "sha256": "f62be70d043b45d9a0c8c154d093c29282644ca6aafa3b3ac41c711c3f5b74f6",
+      "purpose": "reward-hacking review nodes"
+    },
+    {
+      "label": "prompt-cross",
+      "path": ".workflow/resources/standard-round/prompts/cross-review.md",
+      "sha256": "7527424ba63ecf167b34cc36b06b7e822b9be1f2fa8bf9dde0a1470aeede823e",
+      "purpose": "cross-review nodes"
+    },
+    {
+      "label": "prompt-milestone",
+      "path": ".workflow/resources/standard-round/prompts/milestone-review.md",
+      "sha256": "6be2d403f01a4b71750c746d2f444f01ba42c6423bba5e82fda3e0e0249b158c",
+      "purpose": "milestone review nodes"
+    },
+    {
+      "label": "prompt-self-evolve",
+      "path": ".workflow/resources/standard-round/prompts/self-evolve.md",
+      "sha256": "40a845c6d94e43126f5dfeb2a98ddf254edd3b98059fa3d33103d1a7095765f4",
+      "purpose": "self-evolution nodes"
+    },
+    {
+      "label": "prompt-evolve-review",
+      "path": ".workflow/resources/standard-round/prompts/evolve-review.md",
+      "sha256": "b4c5cf8b1eb07e9647e35cce683a2a2b7547c48a08a22987e9fbc268e1df9b94",
+      "purpose": "self-evolution review nodes"
+    },
+    {
+      "label": "reward-action",
+      "path": ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+      "sha256": "32a1190a3e5df82763bb539de7d4c8677a90435306ea6c5cabde1c99458bc343",
+      "purpose": "baseline and evidence command handler"
+    },
+    {
+      "label": "lemma-action",
+      "path": ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+      "sha256": "66a57ef50ebe3c042f80da4ae90dd552291308c05c60b40281d6cad25bb5910a",
+      "purpose": "lemma validation command handler"
+    },
+    {
+      "label": "evidence-helper",
+      "path": ".claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+      "sha256": "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+      "purpose": "mechanical baseline/evidence/current-state implementation"
+    },
+    {
+      "label": "lemma-validator",
+      "path": ".claude/skills/self-improve/scripts/validate_lemmas.py",
+      "sha256": "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+      "purpose": "deterministic lemma schema validator"
+    }
+  ],
+  "externalExecutables": [
+    {
+      "label": "controller-runtime",
+      "source": "controller-runtime"
+    },
+    {
+      "label": "python",
+      "source": "path",
+      "command": "python3"
+    },
+    {
+      "label": "git",
+      "source": "path",
+      "command": "git"
+    },
+    {
+      "label": "native-task",
+      "source": "native-role",
+      "role": "task"
+    },
+    {
+      "label": "native-plan",
+      "source": "native-role",
+      "role": "plan"
+    },
+    {
+      "label": "native-advisor",
+      "source": "native-role",
+      "role": "advisor"
+    }
+  ]
+}

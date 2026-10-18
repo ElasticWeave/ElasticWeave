@@ -1,0 +1,133 @@
+{
+  "schema": "skill-context/v1",
+  "discovery": {
+    "skillsRoot": ".claude/skills",
+    "pattern": "*/SKILL.md",
+    "preserveTopLevel": true
+  },
+  "shared": {
+    "skills": [],
+    "note": "Naive mode is intentionally isolated, so no project skill belongs to the intersection of all three modes. Shared startup semantics live in the mode router and invocation envelope.",
+    "nodeContext": "none"
+  },
+  "modes": {
+    "default": {
+      "bootstrap": [
+        "default-mode"
+      ],
+      "core": [],
+      "onDemandPacks": [
+        "coordination",
+        "delivery",
+        "review",
+        "diagnosis",
+        "governance"
+      ],
+      "nodeSkills": "declared-per-node"
+    },
+    "fast": {
+      "bootstrap": [
+        "fast-mode"
+      ],
+      "core": [],
+      "onDemandPacks": [
+        "coordination",
+        "delivery",
+        "review",
+        "diagnosis",
+        "governance"
+      ],
+      "nodeSkills": "declared-per-node"
+    },
+    "naive": {
+      "bootstrap": [
+        "naive-mode"
+      ],
+      "core": [],
+      "onDemandPacks": [],
+      "nodeSkills": "none"
+    }
+  },
+  "packs": {
+    "coordination": {
+      "skills": [
+        "pm-dispatch",
+        "memory",
+        "self-improve",
+        "complete-milestone"
+      ],
+      "modes": [
+        "default",
+        "fast"
+      ],
+      "audience": "supervisor",
+      "load": "on-demand",
+      "when": "A managed task needs PM coordination, durable project memory, transfer review, or milestone closure."
+    },
+    "delivery": {
+      "skills": [
+        "writing-plans",
+        "build-workflow",
+        "run-workflow",
+        "subagent-workflow",
+        "humanize-workflow",
+        "write-subagent",
+        "write-humanize-flow"
+      ],
+      "modes": [
+        "default",
+        "fast"
+      ],
+      "audience": "supervisor",
+      "load": "on-demand",
+      "when": "Dependencies or design risk justify a plan, or the task requires a bounded worker, workflow graph, or trusted/derived Humanize flow."
+    },
+    "review": {
+      "skills": [
+        "codex-verify",
+        "milestone-review",
+        "proof-rigor",
+        "writeup-human-cleanup"
+      ],
+      "modes": [
+        "default",
+        "fast"
+      ],
+      "audience": "supervisor-or-reviewer",
+      "load": "on-demand",
+      "when": "A candidate needs independent terminal review, proof review, or human-facing cleanup."
+    },
+    "diagnosis": {
+      "skills": [
+        "systematic-debugging",
+        "first-principles",
+        "grind",
+        "generate-insight",
+        "deep-research-workflow",
+        "rethink-workflow-design"
+      ],
+      "modes": [
+        "default",
+        "fast"
+      ],
+      "audience": "supervisor-or-domain-node",
+      "load": "on-demand",
+      "when": "Evidence shows a bug, hard decision, surprising result, causal question, or plateau."
+    },
+    "governance": {
+      "skills": [
+        "constraints-to-hooks",
+        "update-platform-config",
+        "marketplace-search",
+        "session-import"
+      ],
+      "modes": [
+        "default",
+        "fast"
+      ],
+      "audience": "supervisor",
+      "load": "on-demand",
+      "when": "The task consumes constraints, platform synchronization, reusable-capability discovery, or session migration."
+    }
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Humanize Flow"
+  short_description: "Author mode-aware trusted humanize2 flows"
+  default_prompt: "Use $write-humanize-flow to author or revise a trusted humanize2 flow. Keep the top scheduler delegating through an approved Slot, let it select one bounded independent proposal or result-analysis consultation when warranted, preserve evidence-aware reduction and terminal review, and keep the autonomous or human_guided checkpoint and reload boundaries."

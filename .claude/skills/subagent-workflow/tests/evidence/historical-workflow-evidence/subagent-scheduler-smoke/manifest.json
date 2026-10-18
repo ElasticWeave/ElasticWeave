@@ -1,0 +1,323 @@
+{
+  "schema": "subagent-workflow-evidence/v2",
+  "repositoryRootAtCapture": "/Users/muheng/scalable_agent_team",
+  "encodingNote": "Each stored payload is deterministic gzip (mtime=0) wrapped in RFC 4648 base64. SHA-256 and bytes describe the exact decoded and decompressed source bytes. Credential-bearing stderr is never stored; omittedSensitiveEvidence records only an external digest receipt.",
+  "runs": {
+    "authenticatedSmoke": {
+      "designId": "subagent-scheduler-smoke",
+      "runId": "subagent-1785607327755-7362",
+      "sourceRoot": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362",
+      "observed": {
+        "status": "success",
+        "terminal": "success",
+        "modelCalls": 3,
+        "schedulerCalls": 1,
+        "nodeCalls": 2,
+        "wallSeconds": 279.32,
+        "schedulerModel": "anthropic/claude-sonnet-5",
+        "leafModel": "codex/gpt-5.6-sol",
+        "leafEffort": "high"
+      }
+    },
+    "longProbe": {
+      "designId": "subagent-long-node-probe",
+      "runId": "subagent-1785607672865-8848",
+      "sourceRoot": "workflow-output/subagent/subagent-long-node-probe/subagent-1785607672865-8848",
+      "observed": {
+        "status": "success",
+        "terminal": "success",
+        "modelCalls": 0,
+        "schedulerCalls": 0,
+        "nodeCalls": 0,
+        "wallSeconds": 605.08,
+        "nodeElapsedSeconds": 605.069,
+        "nodeTimeoutSeconds": 620,
+        "maxWallTimeSeconds": 660,
+        "requestedSleepSeconds": 605
+      }
+    }
+  },
+  "files": [
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "events.jsonl",
+      "storedPath": "authenticated-smoke/raw/events.jsonl.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/events.jsonl",
+      "encoding": "gzip+base64",
+      "bytes": 1618,
+      "sha256": "744256bdb1906ac94c37c97f2be83bb6ed2d3a426ee768bd01b91d8aabd5e014"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "native-calls.jsonl",
+      "storedPath": "authenticated-smoke/raw/native-calls.jsonl.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/native-calls.jsonl",
+      "encoding": "gzip+base64",
+      "bytes": 790,
+      "sha256": "d073bbbd8733eae8fcad410700a78e2f16fe62df4f64f02a87ff490ab658f133"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "native-responses/scout-a.result.json",
+      "storedPath": "authenticated-smoke/raw/native-responses/scout-a.result.json.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/native-responses/scout-a.result.json",
+      "encoding": "gzip+base64",
+      "bytes": 227,
+      "sha256": "d3fb5a71982dea23b5a761dd344e75172e877b716e4a2e6e55c6475b3a23b3b0"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "native-responses/scout-a.stdout",
+      "storedPath": "authenticated-smoke/raw/native-responses/scout-a.stdout.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/native-responses/scout-a.stdout",
+      "encoding": "gzip+base64",
+      "bytes": 1284,
+      "sha256": "eb34576ff005e578899d3cdff675a964dc88b914aeea9db65ad8e2eaae1f462f"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "native-responses/scout-b.result.json",
+      "storedPath": "authenticated-smoke/raw/native-responses/scout-b.result.json.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/native-responses/scout-b.result.json",
+      "encoding": "gzip+base64",
+      "bytes": 227,
+      "sha256": "f82077b1fa05a4183edae227e4bb090c8b156827d23ae08da2d98a36170be84a"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "native-responses/scout-b.stdout",
+      "storedPath": "authenticated-smoke/raw/native-responses/scout-b.stdout.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/native-responses/scout-b.stdout",
+      "encoding": "gzip+base64",
+      "bytes": 709,
+      "sha256": "907f4d4e0c876c8057e22e498c93cff85fdb0dc8b1ab24ce1170a91c60835413"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "result.json",
+      "storedPath": "authenticated-smoke/raw/result.json.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/result.json",
+      "encoding": "gzip+base64",
+      "bytes": 3723,
+      "sha256": "ca003510658b032e1d0fefc833c0bc38208435f079121412b990dc05d0a5ce98"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "scheduler-decisions.jsonl",
+      "storedPath": "authenticated-smoke/raw/scheduler-decisions.jsonl.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/scheduler-decisions.jsonl",
+      "encoding": "gzip+base64",
+      "bytes": 153,
+      "sha256": "9392f00c106eb3d25b727c2b313c90464eeaccbf1d1709a408e9ce566f859b0e"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "scheduler-responses/1.result.json",
+      "storedPath": "authenticated-smoke/raw/scheduler-responses/1.result.json.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/scheduler-responses/1.result.json",
+      "encoding": "gzip+base64",
+      "bytes": 350,
+      "sha256": "e04afbe7adc430c472537a4c9cc3106ce8914be094056b40f622db40813adf8c"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "scheduler-responses/1.stderr",
+      "storedPath": "authenticated-smoke/raw/scheduler-responses/1.stderr.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/scheduler-responses/1.stderr",
+      "encoding": "gzip+base64",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "scheduler-responses/1.stdout",
+      "storedPath": "authenticated-smoke/raw/scheduler-responses/1.stdout.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/scheduler-responses/1.stdout",
+      "encoding": "gzip+base64",
+      "bytes": 142,
+      "sha256": "42d90c78b3fffa862a68fc8db690bb1a8f7b9ef01ca8b9adb0d270a0a95182b1"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "state.json",
+      "storedPath": "authenticated-smoke/raw/state.json.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/state.json",
+      "encoding": "gzip+base64",
+      "bytes": 8419,
+      "sha256": "353f50514e1faec64028140302d23ed72a69c689b2fd33ce3ffd4ae3f056b763"
+    },
+    {
+      "category": "longProbe",
+      "logicalPath": "command-responses/sleep-probe.result.json",
+      "storedPath": "long-probe/raw/command-responses/sleep-probe.result.json.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-long-node-probe/subagent-1785607672865-8848/command-responses/sleep-probe.result.json",
+      "encoding": "gzip+base64",
+      "bytes": 227,
+      "sha256": "196f3f44958a69b17778356fc093bcb7e0590fa00b51d9048812a0f1d46af477"
+    },
+    {
+      "category": "longProbe",
+      "logicalPath": "command-responses/sleep-probe.stderr",
+      "storedPath": "long-probe/raw/command-responses/sleep-probe.stderr.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-long-node-probe/subagent-1785607672865-8848/command-responses/sleep-probe.stderr",
+      "encoding": "gzip+base64",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "category": "longProbe",
+      "logicalPath": "command-responses/sleep-probe.stdout",
+      "storedPath": "long-probe/raw/command-responses/sleep-probe.stdout.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-long-node-probe/subagent-1785607672865-8848/command-responses/sleep-probe.stdout",
+      "encoding": "gzip+base64",
+      "bytes": 122,
+      "sha256": "fd19b1a1affc9fa4b9595a34adac11587488089f1dcf3e0aad93fc0bc8cb3847"
+    },
+    {
+      "category": "longProbe",
+      "logicalPath": "events.jsonl",
+      "storedPath": "long-probe/raw/events.jsonl.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-long-node-probe/subagent-1785607672865-8848/events.jsonl",
+      "encoding": "gzip+base64",
+      "bytes": 642,
+      "sha256": "68f14570dcf98c25adb7ed2639ffbf640a94386b6eca780d2fe688d2660b6d77"
+    },
+    {
+      "category": "longProbe",
+      "logicalPath": "native-calls.jsonl",
+      "storedPath": "long-probe/raw/native-calls.jsonl.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-long-node-probe/subagent-1785607672865-8848/native-calls.jsonl",
+      "encoding": "gzip+base64",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "category": "longProbe",
+      "logicalPath": "result.json",
+      "storedPath": "long-probe/raw/result.json.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-long-node-probe/subagent-1785607672865-8848/result.json",
+      "encoding": "gzip+base64",
+      "bytes": 1944,
+      "sha256": "e506b28efd582fbc45641976b9c43bf0e98616268c079d1115588421f4712c6d"
+    },
+    {
+      "category": "longProbe",
+      "logicalPath": "state.json",
+      "storedPath": "long-probe/raw/state.json.gz.b64",
+      "sourcePath": "workflow-output/subagent/subagent-long-node-probe/subagent-1785607672865-8848/state.json",
+      "encoding": "gzip+base64",
+      "bytes": 1229,
+      "sha256": "e00228310109d61d5c036caf62b30857db800c2325d94d1ee673aec23134eb6b"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".claude/skills/subagent-workflow/scripts/controller/run.ts",
+      "storedPath": "candidate/.claude/skills/subagent-workflow/scripts/controller/run.ts.gz.b64",
+      "sourcePath": ".claude/skills/subagent-workflow/scripts/controller/run.ts",
+      "encoding": "gzip+base64",
+      "bytes": 84473,
+      "sha256": "8d3c9485754d259b816146a5eba53f763485d819c958c1287d46084afab57260"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".claude/skills/subagent-workflow/scripts/native/run.ts",
+      "storedPath": "candidate/.claude/skills/subagent-workflow/scripts/native/run.ts.gz.b64",
+      "sourcePath": ".claude/skills/subagent-workflow/scripts/native/run.ts",
+      "encoding": "gzip+base64",
+      "bytes": 37228,
+      "sha256": "6c4d46f649b8cb1a37d7318a82e6a88c57b97e1df9a4999d780e727cadccb850"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".workflow/designs/subagent-scheduler-smoke.workflow.json",
+      "storedPath": "candidate/.workflow/designs/subagent-scheduler-smoke.workflow.json.gz.b64",
+      "sourcePath": ".workflow/designs/subagent-scheduler-smoke.workflow.json",
+      "encoding": "gzip+base64",
+      "bytes": 2916,
+      "sha256": "199d1068ff317d46a4c5bf4cd82779637a003c226a60c4641a7b1a156b8378a2"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".workflow/designs/subagent-long-node-probe.workflow.json",
+      "storedPath": "candidate/.workflow/designs/subagent-long-node-probe.workflow.json.gz.b64",
+      "sourcePath": ".workflow/designs/subagent-long-node-probe.workflow.json",
+      "encoding": "gzip+base64",
+      "bytes": 1806,
+      "sha256": "7fe7d5f42ad1c37114da22be65230945c191ada6fa1f33654e360c4a7bce250c"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".subagent/flows/subagent-scheduler-smoke.json",
+      "storedPath": "candidate/.subagent/flows/subagent-scheduler-smoke.json.gz.b64",
+      "sourcePath": ".subagent/flows/subagent-scheduler-smoke.json",
+      "encoding": "gzip+base64",
+      "bytes": 1193,
+      "sha256": "0319df1acaa04ab7e6fb6533d4652380509a08563ddb77a378c74ad3c29439f5"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".subagent/flows/subagent-long-node-probe.json",
+      "storedPath": "candidate/.subagent/flows/subagent-long-node-probe.json.gz.b64",
+      "sourcePath": ".subagent/flows/subagent-long-node-probe.json",
+      "encoding": "gzip+base64",
+      "bytes": 793,
+      "sha256": "59f8da38faefe9c345128ff7d6a4f2c1108e8880dfbaefd341a0c4936d0601e7"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": "config/workflows/models.json",
+      "storedPath": "candidate/config/workflows/models.json.gz.b64",
+      "sourcePath": "config/workflows/models.json",
+      "encoding": "gzip+base64",
+      "bytes": 1079,
+      "sha256": "7ebf40c6681d86f55683bc1710168539fe2db9021e0c11665c58822f32373f6a"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".claude/skills/subagent-workflow/scripts/native/native-map.json",
+      "storedPath": "candidate/.claude/skills/subagent-workflow/scripts/native/native-map.json.gz.b64",
+      "sourcePath": ".claude/skills/subagent-workflow/scripts/native/native-map.json",
+      "encoding": "gzip+base64",
+      "bytes": 3280,
+      "sha256": "d27692fd2a315cb8379579a99981ef6eddce256c380a298eef04a79da714d83b"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".subagent/fixtures/subagent-scheduler-smoke.input.json",
+      "storedPath": "candidate/.subagent/fixtures/subagent-scheduler-smoke.input.json.gz.b64",
+      "sourcePath": ".subagent/fixtures/subagent-scheduler-smoke.input.json",
+      "encoding": "gzip+base64",
+      "bytes": 107,
+      "sha256": "253d6c67eb39066e59696f70c95e9fa5fc8a2efb10b728174336f60642b45ed8"
+    },
+    {
+      "category": "candidate",
+      "logicalPath": ".subagent/fixtures/subagent-long-node-probe.input.json",
+      "storedPath": "candidate/.subagent/fixtures/subagent-long-node-probe.input.json.gz.b64",
+      "sourcePath": ".subagent/fixtures/subagent-long-node-probe.input.json",
+      "encoding": "gzip+base64",
+      "bytes": 3,
+      "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356"
+    }
+  ],
+  "omittedSensitiveEvidence": [
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "native-responses/scout-a.stderr",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/native-responses/scout-a.stderr",
+      "storage": "externalDigest",
+      "bytes": 153265,
+      "sha256": "2a1cde23e4d6dc57ed7bc4cdb73f0cc16c11d23bdc9735819743d009c1d88b67",
+      "reason": "credential-bearing stderr; bytes intentionally omitted and must never be committed"
+    },
+    {
+      "category": "authenticatedSmoke",
+      "logicalPath": "native-responses/scout-b.stderr",
+      "sourcePath": "workflow-output/subagent/subagent-scheduler-smoke/subagent-1785607327755-7362/native-responses/scout-b.stderr",
+      "storage": "externalDigest",
+      "bytes": 17462,
+      "sha256": "b6e7b8bb30e67e7ee9eab8ae96de9ecc39e6d45577ab023eb8334891557b76e9",
+      "reason": "credential-bearing stderr; bytes intentionally omitted and must never be committed"
+    }
+  ]
+}

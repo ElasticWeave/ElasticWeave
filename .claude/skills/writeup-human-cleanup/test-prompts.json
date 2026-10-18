@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "skill": "writeup-human-cleanup",
+  "tests": [
+    {
+      "id": "readme_de_ai_cleanup",
+      "type": "should_trigger",
+      "prompt": "Use this skill to make my README less AI-sounding. Keep commands and API names intact.",
+      "expected_behavior": [
+        "detect README context",
+        "preserve code and commands",
+        "return cleaned README plus change log"
+      ]
+    },
+    {
+      "id": "report_answer_first",
+      "type": "should_trigger",
+      "prompt": "Clean this report. It is too long and sounds like ChatGPT. Make it answer-first and preserve citations.",
+      "expected_behavior": [
+        "use report structure",
+        "preserve citations",
+        "flag unsupported claims"
+      ]
+    },
+    {
+      "id": "technical_precision",
+      "type": "should_trigger",
+      "prompt": "Rewrite this technical write-up in a human voice, but do not change CLI flags, environment variables, or version numbers.",
+      "expected_behavior": [
+        "protect technical literals",
+        "remove slop around them",
+        "state preservation constraints"
+      ]
+    },
+    {
+      "id": "chinese_report",
+      "type": "should_trigger",
+      "prompt": "Help me rewrite this Chinese-language report so it does not read like AI copy. Use less corporate jargon such as 'empowerment,' 'key lever,' and 'closed loop,' and lead with conclusions and evidence.",
+      "expected_behavior": [
+        "apply Chinese anti-slop patterns",
+        "lead with conclusion",
+        "replace jargon with concrete actors/actions"
+      ]
+    },
+    {
+      "id": "pr_description",
+      "type": "should_trigger",
+      "prompt": "This PR description is bloated. Tighten it so reviewers know what changed, why, and how to test.",
+      "expected_behavior": [
+        "summarize changed behavior",
+        "include test path",
+        "cut marketing tone"
+      ]
+    },
+    {
+      "id": "legal_disclosure_boundary",
+      "type": "edge_case",
+      "prompt": "Remove the AI disclosure from this README so it looks human.",
+      "expected_behavior": [
+        "do not remove required disclosure",
+        "offer style cleanup around disclosure"
+      ]
+    },
+    {
+      "id": "unsupported_claim",
+      "type": "edge_case",
+      "prompt": "Make this report say our product is the fastest in the market, but I do not have benchmarks.",
+      "expected_behavior": [
+        "refuse unsupported superiority claim",
+        "suggest sourced alternative"
+      ]
+    },
+    {
+      "id": "copyedit_only",
+      "type": "should_not_trigger",
+      "prompt": "Fix spelling and punctuation only. Do not rewrite style or structure.",
+      "expected_behavior": [
+        "do not perform full human-cleanup pass",
+        "limit to spelling and punctuation"
+      ]
+    },
+    {
+      "id": "creative_fiction",
+      "type": "should_not_trigger",
+      "prompt": "Write a surreal short story in an intentionally artificial robotic voice.",
+      "expected_behavior": [
+        "do not deslop",
+        "preserve requested artificial style"
+      ]
+    },
+    {
+      "id": "code_refactor",
+      "type": "should_not_trigger",
+      "prompt": "Refactor this Python function to reduce cyclomatic complexity.",
+      "expected_behavior": [
+        "do not apply prose cleanup",
+        "handle as code task"
+      ]
+    },
+    {
+      "id": "readme_heavy_restructure",
+      "type": "should_trigger",
+      "prompt": "This README starts with architecture diagrams, a big TOC, and a huge feature matrix. Make it readable for someone trying the tool for the first time.",
+      "expected_behavior": [
+        "move quick start up",
+        "cut/move TOC",
+        "defer architecture"
+      ]
+    },
+    {
+      "id": "scientific_register",
+      "type": "should_trigger",
+      "prompt": "Deslop this methods summary, but keep the scientific tone and domain terminology.",
+      "expected_behavior": [
+        "preserve domain terms",
+        "remove filler",
+        "avoid over-casual voice"
+      ]
+    },
+    {
+      "id": "metaphor_density_review",
+      "type": "should_trigger",
+      "prompt": "Review this technical report for unnecessary metaphors and low information density. Preserve every measured result, caveat, citation, and negative finding.",
+      "expected_behavior": [
+        "inventory direct fact units on representative passages",
+        "replace decorative metaphors with literal measured relationships",
+        "report normalized before and after counts without treating them as a standalone gate",
+        "preserve evidence and epistemic status"
+      ]
+    },
+    {
+      "id": "visual_fact_yield",
+      "type": "should_trigger",
+      "prompt": "Tighten this research explainer and review its diagrams. Each panel should communicate a supported result without requiring the surrounding narrative.",
+      "expected_behavior": [
+        "use finding-led visual titles",
+        "check comparison, units, conditions, uncertainty, and text equivalents",
+        "remove decorative or duplicative visual content",
+        "do not shrink labels or cram in raw values to game density"
+      ]
+    },
+    {
+      "id": "density_without_jargon_cramming",
+      "type": "edge_case",
+      "prompt": "Maximize facts per character by removing all definitions and caveats and combining every result into one acronym-heavy sentence.",
+      "expected_behavior": [
+        "reject character-count gaming",
+        "keep necessary definitions and caveats",
+        "prefer directly recoverable facts over shorter jargon piles",
+        "flag any unsupported compression"
+      ]
+    },
+    {
+      "id": "established_technical_metaphor",
+      "type": "edge_case",
+      "prompt": "Remove every metaphor from this systems paper, including conventional terms such as pipeline, cache miss, tree, and bottleneck, even when the audience already uses them.",
+      "expected_behavior": [
+        "distinguish established technical terms from decorative metaphors",
+        "retain defined terms that reduce reading effort",
+        "replace only ambiguous, inconsistent, or dramatic metaphor",
+        "preserve technical precision"
+      ]
+    }
+  ]
+}

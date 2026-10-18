@@ -1,0 +1,17 @@
+{
+  "itemId": "MAPPING-FIXTURE",
+  "task": "Validation fixture only: inspect the current repository without editing files, then report that no implementation change was requested.",
+  "acceptanceArgv": [
+    "git",
+    "diff",
+    "--check"
+  ],
+  "rewardHackingRisks": [],
+  "proofBinding": {
+    "schema": "subagent-proof-binding/v1",
+    "scope": "no-pm",
+    "itemId": "MAPPING-FIXTURE",
+    "roleModelPolicyDigest": "73c038944c90da3fe26c2573c092b8d86daba16bfef0ecab085bdf6598f90e12",
+    "reason": "Bundled mapping validation fixture; no PM completion or status transition is authorized."
+  }
+}

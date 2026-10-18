@@ -1,0 +1,107 @@
+{
+  "schema": "workflow-design/v1",
+  "id": "subagent-scheduler-smoke",
+  "entry": "seed",
+  "goal": {
+    "objective": "Demonstrate a bounded small-model scheduler over two independent native-agent leaves.",
+    "acceptance": "Both summaries are present, the deterministic merge runs, and the success terminal is reached."
+  },
+  "admission": {
+    "reasons": ["fanout-fanin", "lifecycle-boundary"],
+    "demotionCondition": "Use one native subagent when the two independent viewpoints are unnecessary."
+  },
+  "governance": {
+    "reviewPolicy": "independent",
+    "completionProof": "none",
+    "malformedDecision": "unresolved"
+  },
+  "budgets": {
+    "maxModelCalls": 4,
+    "maxWallTimeSeconds": 900
+  },
+  "requiredCapabilities": [
+    "agent-invocation",
+    "fresh-sessions",
+    "conditional-routing",
+    "structured-output",
+    "fanout-fanin",
+    "durable-checkpoints",
+    "observability"
+  ],
+  "state": [
+    {"name": "topic", "type": "string", "source": "input"},
+    {"name": "summaryA", "type": "string", "source": "scout-a"},
+    {"name": "summaryB", "type": "string", "source": "scout-b"},
+    {"name": "combined", "type": "string", "source": "merge"},
+    {"name": "mergeStatus", "type": "string", "source": "merge"}
+  ],
+  "nodes": [
+    {
+      "id": "seed",
+      "kind": "script",
+      "reads": [],
+      "writes": ["topic"]
+    },
+    {
+      "id": "scout-a",
+      "kind": "agent",
+      "role": "task",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": ["topic"],
+      "writes": ["summaryA"],
+      "timeoutSeconds": 240
+    },
+    {
+      "id": "scout-b",
+      "kind": "agent",
+      "role": "task",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": ["topic"],
+      "writes": ["summaryB"],
+      "timeoutSeconds": 240
+    },
+    {
+      "id": "merge",
+      "kind": "reducer",
+      "waitFor": ["scout-a", "scout-b"],
+      "reads": ["summaryA", "summaryB"],
+      "writes": ["combined", "mergeStatus"]
+    },
+    {
+      "id": "success",
+      "kind": "terminal",
+      "outcome": "success",
+      "reads": ["combined"],
+      "writes": []
+    },
+    {
+      "id": "unresolved",
+      "kind": "terminal",
+      "outcome": "unresolved",
+      "reads": [],
+      "writes": []
+    }
+  ],
+  "transitions": [
+    {"from": "seed", "to": "scout-a"},
+    {"from": "seed", "to": "scout-b"},
+    {"from": "scout-a", "to": "merge"},
+    {"from": "scout-b", "to": "merge"},
+    {"from": "merge", "to": "success", "when": {"field": "mergeStatus", "equals": "PASS"}},
+    {"from": "merge", "to": "unresolved", "when": {"field": "mergeStatus", "equals": "BLOCK"}}
+  ],
+  "terminals": {
+    "success": "success",
+    "unresolved": "unresolved"
+  },
+  "sideEffects": [],
+  "evidence": [
+    "scheduler decision journal",
+    "native call trace",
+    "per-node response digests",
+    "atomic controller checkpoint",
+    "deterministic merged summary"
+  ]
+}

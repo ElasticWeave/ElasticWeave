@@ -1,0 +1,7 @@
+/dispatch.txt
+/history.jsonl
+/owner.lock
+/runtime/
+/candidate.py
+/.slot-load-*/
+/.*.tmp

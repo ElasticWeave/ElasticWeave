@@ -1,0 +1,14 @@
+# Kimi Code hooks — general_agent governance parity (synced into ~/.kimi-code/config.toml by sync_kimi.py,
+# under BEGIN/END general-agent markers so the user's own config is preserved). Same protect_paths.py
+# as Claude Code (stdin JSON, exit 2 blocks) — one governance implementation, three harnesses.
+[[hooks]]
+event = "PreToolUse"
+matcher = "(?i)(write|edit|replace|notebook|patch|apply|bash|shell|exec|terminal)"
+command = "python3 GENERAL_AGENT_REPO/.claude/hooks/protect_paths.py pre"
+timeout = 30
+
+[[hooks]]
+event = "PostToolUse"
+matcher = "(?i)(bash|shell|exec|terminal)"
+command = "python3 GENERAL_AGENT_REPO/.claude/hooks/protect_paths.py post"
+timeout = 30

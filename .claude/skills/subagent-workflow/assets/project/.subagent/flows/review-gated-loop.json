@@ -1,0 +1,284 @@
+{
+  "schema": "subagent-workflow/v1",
+  "designPath": ".workflow/designs/review-gated-loop.workflow.json",
+  "designSha256": "eec29d7923b5acd237a0b8426e3f11cc795ad55753ad99111adf73a55ce9a625",
+  "inputPath": ".subagent/fixtures/review-gated-loop.input.json",
+  "reasoningPosture": "balanced",
+  "scheduler": {
+    "role": "task",
+    "mode": "ambiguous-only",
+    "maxCalls": 0,
+    "reads": []
+  },
+  "proof": {
+    "itemIdField": "itemId",
+    "evidencePathField": "evidencePath",
+    "evidenceDigestField": "evidenceDigest",
+    "helperPath": ".claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+    "resourcesManifestPath": ".workflow/resources/review-gated-loop/manifest.json",
+    "resources": {
+      "prompt-implement": ".workflow/resources/review-gated-loop/implement.md",
+      "prompt-review": ".workflow/resources/review-gated-loop/review.md"
+    },
+    "finalReviewNodes": [
+      "review-r0",
+      "review-r1",
+      "review-r2"
+    ],
+    "evidenceProducerNodes": [
+      "capture-evidence-r0",
+      "capture-evidence-r1",
+      "capture-evidence-r2"
+    ],
+    "currentStateTimeoutSeconds": 7200,
+    "actionPath": ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+    "executables": {
+      "controller-runtime": {
+        "source": "controller-runtime"
+      },
+      "python": {
+        "source": "path",
+        "command": "python3"
+      },
+      "git": {
+        "source": "path",
+        "command": "git"
+      },
+      "native-task": {
+        "source": "native-role",
+        "role": "task"
+      },
+      "native-advisor": {
+        "source": "native-role",
+        "role": "advisor"
+      }
+    }
+  },
+  "handlers": {
+    "seed": {
+      "type": "input",
+      "bindings": {
+        "itemId": "itemId",
+        "task": "task",
+        "acceptanceArgv": "acceptanceArgv",
+        "rewardHackingRisks": "rewardHackingRisks",
+        "implementationSummary": {
+          "const": ""
+        },
+        "revisionCount": {
+          "const": 0
+        },
+        "reviewFeedback": {
+          "const": ""
+        },
+        "lastReviewNode": {
+          "const": ""
+        },
+        "forcedReason": {
+          "const": ""
+        }
+      }
+    },
+    "capture-baseline": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "baseline",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "2da78338344be7433d2cd6ed082b102e7fd8046fe1ed70a77c4f180f5688d223",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--output",
+        "artifacts/baseline.json"
+      ],
+      "runWrites": [
+        "artifacts/baseline.json"
+      ]
+    },
+    "implement-r0": {
+      "type": "agent",
+      "prompt": "Read `.workflow/resources/review-gated-loop/implement.md` completely and follow it.\n\nTASK\n{{task}}\n\nACCEPTANCE\n{{acceptanceArgv}}\n\nREVISION COUNT\n{{revisionCount}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nPRIOR IMPLEMENTATION SUMMARY\n{{implementationSummary}}"
+    },
+    "capture-evidence-r0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "2da78338344be7433d2cd6ed082b102e7fd8046fe1ed70a77c4f180f5688d223",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/evidence-r0.json"
+      ],
+      "runWrites": [
+        "artifacts/evidence-r0.json"
+      ]
+    },
+    "review-r0": {
+      "type": "decision",
+      "prompt": "Read `.workflow/resources/review-gated-loop/review.md` completely and follow it.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nACCEPTANCE\n{{acceptanceArgv}}\n\nIMPLEMENTATION SUMMARY\n{{implementationSummary}}\n\nBASELINE PATH\n{{baselinePath}}\n\nBASELINE SUMMARY\n{{baselineSummary}}\n\nBASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL EVIDENCE\n{{evidence}}\n\nEVIDENCE PATH (relative to controller run directory)\n{{evidencePath}}\n\nEVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}"
+    },
+    "advance-r0": {
+      "type": "increment",
+      "field": "revisionCount",
+      "by": 1,
+      "set": {
+        "lastReviewNode": "review-r0"
+      }
+    },
+    "implement-r1": {
+      "type": "agent",
+      "prompt": "Read `.workflow/resources/review-gated-loop/implement.md` completely and follow it. This is a fresh, state-mediated revision; do not assume provider conversation state.\n\nTASK\n{{task}}\n\nACCEPTANCE\n{{acceptanceArgv}}\n\nREVISION COUNT\n{{revisionCount}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nPRIOR IMPLEMENTATION SUMMARY\n{{implementationSummary}}"
+    },
+    "capture-evidence-r1": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "2da78338344be7433d2cd6ed082b102e7fd8046fe1ed70a77c4f180f5688d223",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/evidence-r1.json"
+      ],
+      "runWrites": [
+        "artifacts/evidence-r1.json"
+      ]
+    },
+    "review-r1": {
+      "type": "decision",
+      "prompt": "Read `.workflow/resources/review-gated-loop/review.md` completely and follow it.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nACCEPTANCE\n{{acceptanceArgv}}\n\nIMPLEMENTATION SUMMARY\n{{implementationSummary}}\n\nBASELINE PATH\n{{baselinePath}}\n\nBASELINE SUMMARY\n{{baselineSummary}}\n\nBASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL EVIDENCE\n{{evidence}}\n\nEVIDENCE PATH (relative to controller run directory)\n{{evidencePath}}\n\nEVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}"
+    },
+    "advance-r1": {
+      "type": "increment",
+      "field": "revisionCount",
+      "by": 1,
+      "set": {
+        "lastReviewNode": "review-r1"
+      }
+    },
+    "implement-r2": {
+      "type": "agent",
+      "prompt": "Read `.workflow/resources/review-gated-loop/implement.md` completely and follow it. This is the last bounded, state-mediated revision; do not assume provider conversation state.\n\nTASK\n{{task}}\n\nACCEPTANCE\n{{acceptanceArgv}}\n\nREVISION COUNT\n{{revisionCount}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nPRIOR IMPLEMENTATION SUMMARY\n{{implementationSummary}}"
+    },
+    "capture-evidence-r2": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "2da78338344be7433d2cd6ed082b102e7fd8046fe1ed70a77c4f180f5688d223",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/evidence-r2.json"
+      ],
+      "runWrites": [
+        "artifacts/evidence-r2.json"
+      ]
+    },
+    "review-r2": {
+      "type": "decision",
+      "prompt": "Read `.workflow/resources/review-gated-loop/review.md` completely and follow it.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nACCEPTANCE\n{{acceptanceArgv}}\n\nIMPLEMENTATION SUMMARY\n{{implementationSummary}}\n\nBASELINE PATH\n{{baselinePath}}\n\nBASELINE SUMMARY\n{{baselineSummary}}\n\nBASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL EVIDENCE\n{{evidence}}\n\nEVIDENCE PATH (relative to controller run directory)\n{{evidencePath}}\n\nEVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}"
+    },
+    "exhaust-revisions": {
+      "type": "increment",
+      "field": "revisionCount",
+      "by": 1,
+      "set": {
+        "lastReviewNode": "review-r2",
+        "forcedReason": "revision cap exhausted after review-r2"
+      }
+    },
+    "archive-proof": {
+      "type": "template",
+      "values": {
+        "proofCandidatePath": "workflow-output/subagent/review-gated-loop/{{controller.runId}}/state-bound-candidate.json"
+      }
+    },
+    "success": {
+      "type": "terminal"
+    },
+    "unresolved": {
+      "type": "terminal"
+    }
+  }
+}

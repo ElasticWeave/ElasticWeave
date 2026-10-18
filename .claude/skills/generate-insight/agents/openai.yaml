@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate Insight"
+  short_description: "Turn experiments into evidence-bound insights"
+  default_prompt: "Use $generate-insight to test and resolve one causal insight from this evidence."

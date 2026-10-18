@@ -1,0 +1,26 @@
+{
+  "schema": "subagent-workflow/v1",
+  "designPath": ".workflow/designs/subagent-long-node-probe.workflow.json",
+  "designSha256": "cff4d858460ea86b61ac379a95a4c2fef9bca58fd8dfa5b36d498809fe9fa19d",
+  "inputPath": ".subagent/fixtures/subagent-long-node-probe.input.json",
+  "reasoningPosture": "economy",
+  "scheduler": {
+    "role": "smol",
+    "mode": "ambiguous-only",
+    "maxCalls": 0,
+    "timeoutSeconds": 30,
+    "reads": []
+  },
+  "handlers": {
+    "sleep-probe": {
+      "type": "command",
+      "argv": [
+        "python3",
+        "-c",
+        "import json,time; time.sleep(605); print(json.dumps({'summary':'completed explicit 605-second probe','statePatch':[{'op':'set','path':'/probeStatus','value':'PASS'}]}))"
+      ]
+    },
+    "success": {"type": "terminal"},
+    "unresolved": {"type": "terminal"}
+  }
+}

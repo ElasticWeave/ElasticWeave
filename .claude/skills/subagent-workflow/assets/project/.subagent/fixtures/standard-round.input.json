@@ -1,0 +1,15 @@
+{
+  "itemId": "fixture-standard-round",
+  "task": "Fixture only: validate the standard-round mapping without starting model work.",
+  "acceptanceArgv": [
+    "/usr/bin/true"
+  ],
+  "rewardHackingRisks": [],
+  "proofBinding": {
+    "schema": "subagent-proof-binding/v1",
+    "scope": "no-pm",
+    "itemId": "fixture-standard-round",
+    "roleModelPolicyDigest": "73c038944c90da3fe26c2573c092b8d86daba16bfef0ecab085bdf6598f90e12",
+    "reason": "Bundled mapping validation fixture; no PM completion or status transition is authorized."
+  }
+}
