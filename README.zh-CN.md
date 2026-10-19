@@ -154,6 +154,10 @@ Agent 会一起处理技能包变更和指令刷新，不需要另开顶层 sess
 }
 ```
 
+## Sponsorship
+
+如有赞助咨询事宜，请联系 muhengli2005@gmail.com。
+
 ## 许可证
 
 [MIT](LICENSE)。

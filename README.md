@@ -181,6 +181,10 @@ If you use ElasticWeave in your research, please cite it as:
 }
 ```
 
+## Sponsorship
+
+For sponsorship enquiries, please contact muhengli2005@gmail.com.
+
 ## License
 
 [MIT](LICENSE).
