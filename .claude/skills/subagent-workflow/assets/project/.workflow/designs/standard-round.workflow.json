@@ -1,0 +1,3414 @@
+{
+  "schema": "workflow-design/v1",
+  "id": "standard-round",
+  "entry": "seed",
+  "goal": {
+    "objective": "Run one governance-complete implementation round as a finite acyclic graph with mechanical byte evidence, independent review, globally bounded revision and self-evolution, and controller-finalized state-bound completion proof.",
+    "acceptance": "The supplied focused-check argv succeeds without shell interpretation, every writing path passes the required independent reviews against the task criteria, the archive node emits only a proof candidate marker, and the controller binds the final proof to the reviewed workspace bytes."
+  },
+  "admission": {
+    "reasons": [
+      "multi-stage",
+      "machine-gated-review",
+      "protected-control-plane",
+      "long-running"
+    ],
+    "demotionCondition": "Use a native subagent when the task does not need the byte-evidence chain, multiple independent verdict stages, reviewed self-evolution, or machine-controlled state-bound completion."
+  },
+  "governance": {
+    "reviewPolicy": "machine-gated",
+    "completionProof": "state-bound",
+    "malformedDecision": "unresolved"
+  },
+  "budgets": {
+    "maxModelCalls": 24,
+    "maxReviewCycles": 3,
+    "maxEvolutionCycles": 2
+  },
+  "requiredCapabilities": [
+    "agent-invocation",
+    "fresh-sessions",
+    "interrupted-session-resume",
+    "node-skill-loading",
+    "conditional-routing",
+    "structured-output",
+    "durable-checkpoints",
+    "observability",
+    "machine-gated-review",
+    "state-bound-proof"
+  ],
+  "state": [
+    {
+      "name": "itemId",
+      "type": "string",
+      "source": "input"
+    },
+    {
+      "name": "task",
+      "type": "string",
+      "source": "input"
+    },
+    {
+      "name": "acceptanceArgv",
+      "type": "array",
+      "source": "input"
+    },
+    {
+      "name": "rewardHackingRisks",
+      "type": "array",
+      "maxItems": 5,
+      "itemType": "string",
+      "maxItemBytes": 2048,
+      "uniqueItems": true,
+      "source": "input"
+    },
+    {
+      "name": "report",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "reviewFeedback",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "lastReviewNode",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "baselinePath",
+      "type": "string",
+      "source": "capture-baseline"
+    },
+    {
+      "name": "baselineSummary",
+      "type": "string",
+      "source": "capture-baseline"
+    },
+    {
+      "name": "baselineDigest",
+      "type": "string",
+      "source": "capture-baseline"
+    },
+    {
+      "name": "evidence",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "evidencePath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "evidenceDigest",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "stateBinding",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "reviseCount",
+      "type": "number",
+      "source": "controller"
+    },
+    {
+      "name": "evolveCount",
+      "type": "number",
+      "source": "controller"
+    },
+    {
+      "name": "evolutionRetryUsed",
+      "type": "boolean",
+      "source": "controller"
+    },
+    {
+      "name": "evolveNotes",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "lemmaReport",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "lemmaValidation",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "proofCandidatePath",
+      "type": "string",
+      "source": "archive-proof"
+    },
+    {
+      "name": "forcedReason",
+      "type": "string",
+      "source": "controller"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "seed",
+      "kind": "script",
+      "reads": [],
+      "writes": [
+        "itemId",
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "report",
+        "reviseCount",
+        "evolveCount",
+        "evolutionRetryUsed",
+        "reviewFeedback",
+        "lastReviewNode",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-baseline",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "itemId"
+      ],
+      "writes": [
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "implement-r0-u0",
+      "kind": "agent",
+      "role": "task",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "grind"
+        ],
+        "onDemand": [
+          "systematic-debugging"
+        ]
+      },
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "reviewFeedback",
+        "lastReviewNode",
+        "reviseCount",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "report"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "capture-evidence-r0-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "reward-hack-review-r0-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r0-u0",
+        "capture-evidence-r0-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "cross-review-r0-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r0-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [],
+        "onDemand": [
+          "first-principles"
+        ]
+      }
+    },
+    {
+      "id": "milestone-review-r0-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r0-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [
+          "first-principles"
+        ],
+        "onDemand": []
+      }
+    },
+    {
+      "id": "advance-revision-r0-u0-implementation",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-reward-hack-review-r0-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-cross-review-r0-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-milestone-review-r0-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "self-evolve-a-r0-u0",
+      "kind": "agent",
+      "role": "plan",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "self-improve",
+          "memory"
+        ],
+        "onDemand": []
+      },
+      "reads": [
+        "task",
+        "reviewFeedback",
+        "lastReviewNode",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "evolveNotes",
+        "lemmaReport"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "validate-lemmas-a-r0-u0",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "lemmaReport"
+      ],
+      "writes": [
+        "lemmaValidation"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "evolve-review-a-r0-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "evolveNotes",
+        "lemmaReport",
+        "lemmaValidation",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "self-evolve-a-r0-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-final-evidence-a-r0-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "final-reward-hack-review-a-r0-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "capture-evidence-r0-u0",
+        "capture-final-evidence-a-r0-u0",
+        "implement-r0-u0",
+        "self-evolve-a-r0-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-final-reward-hack-review-a-r0-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "advance-revision-r0-u0-final-a",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-evolve-review-a-r0-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "consume-evolution-retry-r0-u0",
+      "kind": "script",
+      "reads": [
+        "evolveCount",
+        "evolutionRetryUsed",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "self-evolve-b-r0-u0",
+      "kind": "agent",
+      "role": "plan",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "self-improve",
+          "memory"
+        ],
+        "onDemand": []
+      },
+      "reads": [
+        "task",
+        "reviewFeedback",
+        "lastReviewNode",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "evolveNotes",
+        "lemmaReport"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "validate-lemmas-b-r0-u0",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "lemmaReport"
+      ],
+      "writes": [
+        "lemmaValidation"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "evolve-review-b-r0-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "evolveNotes",
+        "lemmaReport",
+        "lemmaValidation",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "self-evolve-b-r0-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-final-evidence-b-r0-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "final-reward-hack-review-b-r0-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "capture-evidence-r0-u0",
+        "capture-final-evidence-b-r0-u0",
+        "implement-r0-u0",
+        "self-evolve-a-r0-u0",
+        "self-evolve-b-r0-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-evolve-review-b-r0-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-evolution-r0-u0-b",
+      "kind": "script",
+      "reads": [
+        "evolveCount",
+        "evolutionRetryUsed",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "evolveCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-final-reward-hack-review-b-r0-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "advance-revision-r0-u0-final-b",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "implement-r1-u0",
+      "kind": "agent",
+      "role": "task",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "grind"
+        ],
+        "onDemand": [
+          "systematic-debugging"
+        ]
+      },
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "reviewFeedback",
+        "lastReviewNode",
+        "reviseCount",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "report"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "capture-evidence-r1-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "reward-hack-review-r1-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r1-u0",
+        "capture-evidence-r1-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "cross-review-r1-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r1-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [],
+        "onDemand": [
+          "first-principles"
+        ]
+      }
+    },
+    {
+      "id": "milestone-review-r1-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r1-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [
+          "first-principles"
+        ],
+        "onDemand": []
+      }
+    },
+    {
+      "id": "advance-revision-r1-u0-implementation",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-reward-hack-review-r1-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-cross-review-r1-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-milestone-review-r1-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "self-evolve-a-r1-u0",
+      "kind": "agent",
+      "role": "plan",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "self-improve",
+          "memory"
+        ],
+        "onDemand": []
+      },
+      "reads": [
+        "task",
+        "reviewFeedback",
+        "lastReviewNode",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "evolveNotes",
+        "lemmaReport"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "validate-lemmas-a-r1-u0",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "lemmaReport"
+      ],
+      "writes": [
+        "lemmaValidation"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "evolve-review-a-r1-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "evolveNotes",
+        "lemmaReport",
+        "lemmaValidation",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "self-evolve-a-r1-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-final-evidence-a-r1-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "final-reward-hack-review-a-r1-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "capture-evidence-r0-u0",
+        "capture-evidence-r1-u0",
+        "capture-final-evidence-a-r0-u0",
+        "capture-final-evidence-a-r1-u0",
+        "implement-r0-u0",
+        "implement-r1-u0",
+        "self-evolve-a-r0-u0",
+        "self-evolve-a-r1-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-final-reward-hack-review-a-r1-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "advance-revision-r1-u0-final-a",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-evolve-review-a-r1-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "consume-evolution-retry-r1-u0",
+      "kind": "script",
+      "reads": [
+        "evolveCount",
+        "evolutionRetryUsed",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "self-evolve-b-r1-u0",
+      "kind": "agent",
+      "role": "plan",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "self-improve",
+          "memory"
+        ],
+        "onDemand": []
+      },
+      "reads": [
+        "task",
+        "reviewFeedback",
+        "lastReviewNode",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "evolveNotes",
+        "lemmaReport"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "validate-lemmas-b-r1-u0",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "lemmaReport"
+      ],
+      "writes": [
+        "lemmaValidation"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "evolve-review-b-r1-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "evolveNotes",
+        "lemmaReport",
+        "lemmaValidation",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "self-evolve-b-r1-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-final-evidence-b-r1-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "final-reward-hack-review-b-r1-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "capture-evidence-r0-u0",
+        "capture-evidence-r1-u0",
+        "capture-final-evidence-a-r0-u0",
+        "capture-final-evidence-b-r1-u0",
+        "implement-r0-u0",
+        "implement-r1-u0",
+        "self-evolve-a-r0-u0",
+        "self-evolve-a-r1-u0",
+        "self-evolve-b-r1-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-evolve-review-b-r1-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-evolution-r1-u0-b",
+      "kind": "script",
+      "reads": [
+        "evolveCount",
+        "evolutionRetryUsed",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "evolveCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-final-reward-hack-review-b-r1-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "advance-revision-r1-u0-final-b",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "implement-r2-u0",
+      "kind": "agent",
+      "role": "task",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "grind"
+        ],
+        "onDemand": [
+          "systematic-debugging"
+        ]
+      },
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "reviewFeedback",
+        "lastReviewNode",
+        "reviseCount",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "report"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "capture-evidence-r2-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "reward-hack-review-r2-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r2-u0",
+        "capture-evidence-r2-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "cross-review-r2-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r2-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [],
+        "onDemand": [
+          "first-principles"
+        ]
+      }
+    },
+    {
+      "id": "milestone-review-r2-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r2-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [
+          "first-principles"
+        ],
+        "onDemand": []
+      }
+    },
+    {
+      "id": "exhaust-revision-r2-u0-implementation",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-reward-hack-review-r2-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-cross-review-r2-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-milestone-review-r2-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "self-evolve-a-r2-u0",
+      "kind": "agent",
+      "role": "plan",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "self-improve",
+          "memory"
+        ],
+        "onDemand": []
+      },
+      "reads": [
+        "task",
+        "reviewFeedback",
+        "lastReviewNode",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "evolveNotes",
+        "lemmaReport"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "validate-lemmas-a-r2-u0",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "lemmaReport"
+      ],
+      "writes": [
+        "lemmaValidation"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "evolve-review-a-r2-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "evolveNotes",
+        "lemmaReport",
+        "lemmaValidation",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "self-evolve-a-r2-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-final-evidence-a-r2-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "final-reward-hack-review-a-r2-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "capture-evidence-r0-u0",
+        "capture-evidence-r1-u0",
+        "capture-evidence-r2-u0",
+        "capture-final-evidence-a-r0-u0",
+        "capture-final-evidence-a-r1-u0",
+        "capture-final-evidence-a-r2-u0",
+        "implement-r0-u0",
+        "implement-r1-u0",
+        "implement-r2-u0",
+        "self-evolve-a-r0-u0",
+        "self-evolve-a-r1-u0",
+        "self-evolve-a-r2-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-final-reward-hack-review-a-r2-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-revision-r2-u0-final-a",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-evolve-review-a-r2-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "consume-evolution-retry-r2-u0",
+      "kind": "script",
+      "reads": [
+        "evolveCount",
+        "evolutionRetryUsed",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "self-evolve-b-r2-u0",
+      "kind": "agent",
+      "role": "plan",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "self-improve",
+          "memory"
+        ],
+        "onDemand": []
+      },
+      "reads": [
+        "task",
+        "reviewFeedback",
+        "lastReviewNode",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "evolveNotes",
+        "lemmaReport"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "validate-lemmas-b-r2-u0",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "lemmaReport"
+      ],
+      "writes": [
+        "lemmaValidation"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "evolve-review-b-r2-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "evolveNotes",
+        "lemmaReport",
+        "lemmaValidation",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "self-evolve-b-r2-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-final-evidence-b-r2-u0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "final-reward-hack-review-b-r2-u0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "capture-evidence-r0-u0",
+        "capture-evidence-r1-u0",
+        "capture-evidence-r2-u0",
+        "capture-final-evidence-a-r0-u0",
+        "capture-final-evidence-a-r1-u0",
+        "capture-final-evidence-b-r2-u0",
+        "implement-r0-u0",
+        "implement-r1-u0",
+        "implement-r2-u0",
+        "self-evolve-a-r0-u0",
+        "self-evolve-a-r1-u0",
+        "self-evolve-a-r2-u0",
+        "self-evolve-b-r2-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-evolve-review-b-r2-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-evolution-r2-u0-b",
+      "kind": "script",
+      "reads": [
+        "evolveCount",
+        "evolutionRetryUsed",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "evolveCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-final-reward-hack-review-b-r2-u0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-revision-r2-u0-final-b",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "implement-r1-u1",
+      "kind": "agent",
+      "role": "task",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "grind"
+        ],
+        "onDemand": [
+          "systematic-debugging"
+        ]
+      },
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "reviewFeedback",
+        "lastReviewNode",
+        "reviseCount",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "report"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "capture-evidence-r1-u1",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "reward-hack-review-r1-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r1-u1",
+        "capture-evidence-r1-u1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "cross-review-r1-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r1-u1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [],
+        "onDemand": [
+          "first-principles"
+        ]
+      }
+    },
+    {
+      "id": "milestone-review-r1-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r1-u1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [
+          "first-principles"
+        ],
+        "onDemand": []
+      }
+    },
+    {
+      "id": "advance-revision-r1-u1-implementation",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-reward-hack-review-r1-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-cross-review-r1-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-milestone-review-r1-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "self-evolve-a-r1-u1",
+      "kind": "agent",
+      "role": "plan",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "self-improve",
+          "memory"
+        ],
+        "onDemand": []
+      },
+      "reads": [
+        "task",
+        "reviewFeedback",
+        "lastReviewNode",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "evolveNotes",
+        "lemmaReport"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "validate-lemmas-a-r1-u1",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "lemmaReport"
+      ],
+      "writes": [
+        "lemmaValidation"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "evolve-review-a-r1-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "evolveNotes",
+        "lemmaReport",
+        "lemmaValidation",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "self-evolve-a-r1-u1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-final-evidence-a-r1-u1",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "final-reward-hack-review-a-r1-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "capture-evidence-r0-u0",
+        "capture-evidence-r1-u1",
+        "capture-final-evidence-a-r1-u1",
+        "capture-final-evidence-b-r0-u0",
+        "implement-r0-u0",
+        "implement-r1-u1",
+        "self-evolve-a-r0-u0",
+        "self-evolve-a-r1-u1",
+        "self-evolve-b-r0-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-final-reward-hack-review-a-r1-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "advance-revision-r1-u1-final-a",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-evolve-review-a-r1-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-evolution-r1-u1-a",
+      "kind": "script",
+      "reads": [
+        "evolveCount",
+        "evolutionRetryUsed",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "evolveCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "implement-r2-u1",
+      "kind": "agent",
+      "role": "task",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "grind"
+        ],
+        "onDemand": [
+          "systematic-debugging"
+        ]
+      },
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "reviewFeedback",
+        "lastReviewNode",
+        "reviseCount",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "report"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "capture-evidence-r2-u1",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "reward-hack-review-r2-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r2-u1",
+        "capture-evidence-r2-u1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "cross-review-r2-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r2-u1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [],
+        "onDemand": [
+          "first-principles"
+        ]
+      }
+    },
+    {
+      "id": "milestone-review-r2-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "report",
+        "evidencePath",
+        "evidenceDigest"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "implement-r2-u1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200,
+      "skills": {
+        "required": [
+          "first-principles"
+        ],
+        "onDemand": []
+      }
+    },
+    {
+      "id": "exhaust-revision-r2-u1-implementation",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-reward-hack-review-r2-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-cross-review-r2-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-milestone-review-r2-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "self-evolve-a-r2-u1",
+      "kind": "agent",
+      "role": "plan",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "skills": {
+        "required": [
+          "self-improve",
+          "memory"
+        ],
+        "onDemand": []
+      },
+      "reads": [
+        "task",
+        "reviewFeedback",
+        "lastReviewNode",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "evolveNotes",
+        "lemmaReport"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "validate-lemmas-a-r2-u1",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "lemmaReport"
+      ],
+      "writes": [
+        "lemmaValidation"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "evolve-review-a-r2-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "evolveNotes",
+        "lemmaReport",
+        "lemmaValidation",
+        "evolutionRetryUsed"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "APPROVE",
+        "REVISE"
+      ],
+      "reviews": [
+        "self-evolve-a-r2-u1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-final-evidence-a-r2-u1",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "final-reward-hack-review-a-r2-u1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE"
+      ],
+      "reviews": [
+        "capture-evidence-r0-u0",
+        "capture-evidence-r1-u0",
+        "capture-evidence-r1-u1",
+        "capture-evidence-r2-u1",
+        "capture-final-evidence-a-r0-u0",
+        "capture-final-evidence-a-r1-u1",
+        "capture-final-evidence-a-r2-u1",
+        "capture-final-evidence-b-r0-u0",
+        "capture-final-evidence-b-r1-u0",
+        "implement-r0-u0",
+        "implement-r1-u0",
+        "implement-r1-u1",
+        "implement-r2-u1",
+        "self-evolve-a-r0-u0",
+        "self-evolve-a-r1-u0",
+        "self-evolve-a-r1-u1",
+        "self-evolve-a-r2-u1",
+        "self-evolve-b-r0-u0",
+        "self-evolve-b-r1-u0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-final-reward-hack-review-a-r2-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-revision-r2-u1-final-a",
+      "kind": "script",
+      "reads": [
+        "reviseCount",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "reviseCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "record-evolve-review-a-r2-u1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback"
+      ],
+      "writes": [
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-evolution-r2-u1-a",
+      "kind": "script",
+      "reads": [
+        "evolveCount",
+        "evolutionRetryUsed",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "evolveCount",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "archive-proof",
+      "kind": "script",
+      "reads": [
+        "itemId",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding",
+        "reviewFeedback",
+        "lastReviewNode"
+      ],
+      "writes": [
+        "proofCandidatePath"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "success",
+      "kind": "terminal",
+      "outcome": "success",
+      "reads": [
+        "proofCandidatePath",
+        "report",
+        "evolveNotes",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": []
+    },
+    {
+      "id": "unresolved",
+      "kind": "terminal",
+      "outcome": "unresolved",
+      "reads": [
+        "reviewFeedback",
+        "lastReviewNode",
+        "forcedReason",
+        "reviseCount",
+        "evolveCount",
+        "evolutionRetryUsed"
+      ],
+      "writes": []
+    }
+  ],
+  "transitions": [
+    {
+      "from": "seed",
+      "to": "capture-baseline"
+    },
+    {
+      "from": "capture-baseline",
+      "to": "implement-r0-u0"
+    },
+    {
+      "from": "implement-r0-u0",
+      "to": "capture-evidence-r0-u0"
+    },
+    {
+      "from": "capture-evidence-r0-u0",
+      "to": "reward-hack-review-r0-u0"
+    },
+    {
+      "from": "reward-hack-review-r0-u0",
+      "to": "cross-review-r0-u0",
+      "when": {
+        "field": "reward-hack-review-r0-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "cross-review-r0-u0",
+      "to": "milestone-review-r0-u0",
+      "when": {
+        "field": "cross-review-r0-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "advance-revision-r0-u0-implementation",
+      "to": "implement-r1-u0"
+    },
+    {
+      "from": "reward-hack-review-r0-u0",
+      "to": "record-reward-hack-review-r0-u0",
+      "when": {
+        "field": "reward-hack-review-r0-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-reward-hack-review-r0-u0",
+      "to": "advance-revision-r0-u0-implementation"
+    },
+    {
+      "from": "cross-review-r0-u0",
+      "to": "record-cross-review-r0-u0",
+      "when": {
+        "field": "cross-review-r0-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-cross-review-r0-u0",
+      "to": "advance-revision-r0-u0-implementation"
+    },
+    {
+      "from": "milestone-review-r0-u0",
+      "to": "record-milestone-review-r0-u0",
+      "when": {
+        "field": "milestone-review-r0-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-milestone-review-r0-u0",
+      "to": "advance-revision-r0-u0-implementation"
+    },
+    {
+      "from": "milestone-review-r0-u0",
+      "to": "self-evolve-a-r0-u0",
+      "when": {
+        "field": "milestone-review-r0-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "self-evolve-a-r0-u0",
+      "to": "validate-lemmas-a-r0-u0"
+    },
+    {
+      "from": "validate-lemmas-a-r0-u0",
+      "to": "evolve-review-a-r0-u0"
+    },
+    {
+      "from": "evolve-review-a-r0-u0",
+      "to": "capture-final-evidence-a-r0-u0",
+      "when": {
+        "field": "evolve-review-a-r0-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "capture-final-evidence-a-r0-u0",
+      "to": "final-reward-hack-review-a-r0-u0"
+    },
+    {
+      "from": "final-reward-hack-review-a-r0-u0",
+      "to": "archive-proof",
+      "when": {
+        "field": "final-reward-hack-review-a-r0-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "final-reward-hack-review-a-r0-u0",
+      "to": "record-final-reward-hack-review-a-r0-u0",
+      "when": {
+        "field": "final-reward-hack-review-a-r0-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "advance-revision-r0-u0-final-a",
+      "to": "implement-r1-u0"
+    },
+    {
+      "from": "record-final-reward-hack-review-a-r0-u0",
+      "to": "advance-revision-r0-u0-final-a"
+    },
+    {
+      "from": "evolve-review-a-r0-u0",
+      "to": "record-evolve-review-a-r0-u0",
+      "when": {
+        "field": "evolve-review-a-r0-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-evolve-review-a-r0-u0",
+      "to": "consume-evolution-retry-r0-u0"
+    },
+    {
+      "from": "consume-evolution-retry-r0-u0",
+      "to": "self-evolve-b-r0-u0"
+    },
+    {
+      "from": "self-evolve-b-r0-u0",
+      "to": "validate-lemmas-b-r0-u0"
+    },
+    {
+      "from": "validate-lemmas-b-r0-u0",
+      "to": "evolve-review-b-r0-u0"
+    },
+    {
+      "from": "evolve-review-b-r0-u0",
+      "to": "capture-final-evidence-b-r0-u0",
+      "when": {
+        "field": "evolve-review-b-r0-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "capture-final-evidence-b-r0-u0",
+      "to": "final-reward-hack-review-b-r0-u0"
+    },
+    {
+      "from": "final-reward-hack-review-b-r0-u0",
+      "to": "archive-proof",
+      "when": {
+        "field": "final-reward-hack-review-b-r0-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "evolve-review-b-r0-u0",
+      "to": "record-evolve-review-b-r0-u0",
+      "when": {
+        "field": "evolve-review-b-r0-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-evolve-review-b-r0-u0",
+      "to": "exhaust-evolution-r0-u0-b"
+    },
+    {
+      "from": "exhaust-evolution-r0-u0-b",
+      "to": "unresolved"
+    },
+    {
+      "from": "final-reward-hack-review-b-r0-u0",
+      "to": "record-final-reward-hack-review-b-r0-u0",
+      "when": {
+        "field": "final-reward-hack-review-b-r0-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "advance-revision-r0-u0-final-b",
+      "to": "implement-r1-u1"
+    },
+    {
+      "from": "record-final-reward-hack-review-b-r0-u0",
+      "to": "advance-revision-r0-u0-final-b"
+    },
+    {
+      "from": "implement-r1-u0",
+      "to": "capture-evidence-r1-u0"
+    },
+    {
+      "from": "capture-evidence-r1-u0",
+      "to": "reward-hack-review-r1-u0"
+    },
+    {
+      "from": "reward-hack-review-r1-u0",
+      "to": "cross-review-r1-u0",
+      "when": {
+        "field": "reward-hack-review-r1-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "cross-review-r1-u0",
+      "to": "milestone-review-r1-u0",
+      "when": {
+        "field": "cross-review-r1-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "advance-revision-r1-u0-implementation",
+      "to": "implement-r2-u0"
+    },
+    {
+      "from": "reward-hack-review-r1-u0",
+      "to": "record-reward-hack-review-r1-u0",
+      "when": {
+        "field": "reward-hack-review-r1-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-reward-hack-review-r1-u0",
+      "to": "advance-revision-r1-u0-implementation"
+    },
+    {
+      "from": "cross-review-r1-u0",
+      "to": "record-cross-review-r1-u0",
+      "when": {
+        "field": "cross-review-r1-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-cross-review-r1-u0",
+      "to": "advance-revision-r1-u0-implementation"
+    },
+    {
+      "from": "milestone-review-r1-u0",
+      "to": "record-milestone-review-r1-u0",
+      "when": {
+        "field": "milestone-review-r1-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-milestone-review-r1-u0",
+      "to": "advance-revision-r1-u0-implementation"
+    },
+    {
+      "from": "milestone-review-r1-u0",
+      "to": "self-evolve-a-r1-u0",
+      "when": {
+        "field": "milestone-review-r1-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "self-evolve-a-r1-u0",
+      "to": "validate-lemmas-a-r1-u0"
+    },
+    {
+      "from": "validate-lemmas-a-r1-u0",
+      "to": "evolve-review-a-r1-u0"
+    },
+    {
+      "from": "evolve-review-a-r1-u0",
+      "to": "capture-final-evidence-a-r1-u0",
+      "when": {
+        "field": "evolve-review-a-r1-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "capture-final-evidence-a-r1-u0",
+      "to": "final-reward-hack-review-a-r1-u0"
+    },
+    {
+      "from": "final-reward-hack-review-a-r1-u0",
+      "to": "archive-proof",
+      "when": {
+        "field": "final-reward-hack-review-a-r1-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "final-reward-hack-review-a-r1-u0",
+      "to": "record-final-reward-hack-review-a-r1-u0",
+      "when": {
+        "field": "final-reward-hack-review-a-r1-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "advance-revision-r1-u0-final-a",
+      "to": "implement-r2-u0"
+    },
+    {
+      "from": "record-final-reward-hack-review-a-r1-u0",
+      "to": "advance-revision-r1-u0-final-a"
+    },
+    {
+      "from": "evolve-review-a-r1-u0",
+      "to": "record-evolve-review-a-r1-u0",
+      "when": {
+        "field": "evolve-review-a-r1-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-evolve-review-a-r1-u0",
+      "to": "consume-evolution-retry-r1-u0"
+    },
+    {
+      "from": "consume-evolution-retry-r1-u0",
+      "to": "self-evolve-b-r1-u0"
+    },
+    {
+      "from": "self-evolve-b-r1-u0",
+      "to": "validate-lemmas-b-r1-u0"
+    },
+    {
+      "from": "validate-lemmas-b-r1-u0",
+      "to": "evolve-review-b-r1-u0"
+    },
+    {
+      "from": "evolve-review-b-r1-u0",
+      "to": "capture-final-evidence-b-r1-u0",
+      "when": {
+        "field": "evolve-review-b-r1-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "capture-final-evidence-b-r1-u0",
+      "to": "final-reward-hack-review-b-r1-u0"
+    },
+    {
+      "from": "final-reward-hack-review-b-r1-u0",
+      "to": "archive-proof",
+      "when": {
+        "field": "final-reward-hack-review-b-r1-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "evolve-review-b-r1-u0",
+      "to": "record-evolve-review-b-r1-u0",
+      "when": {
+        "field": "evolve-review-b-r1-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-evolve-review-b-r1-u0",
+      "to": "exhaust-evolution-r1-u0-b"
+    },
+    {
+      "from": "exhaust-evolution-r1-u0-b",
+      "to": "unresolved"
+    },
+    {
+      "from": "final-reward-hack-review-b-r1-u0",
+      "to": "record-final-reward-hack-review-b-r1-u0",
+      "when": {
+        "field": "final-reward-hack-review-b-r1-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "advance-revision-r1-u0-final-b",
+      "to": "implement-r2-u1"
+    },
+    {
+      "from": "record-final-reward-hack-review-b-r1-u0",
+      "to": "advance-revision-r1-u0-final-b"
+    },
+    {
+      "from": "implement-r2-u0",
+      "to": "capture-evidence-r2-u0"
+    },
+    {
+      "from": "capture-evidence-r2-u0",
+      "to": "reward-hack-review-r2-u0"
+    },
+    {
+      "from": "reward-hack-review-r2-u0",
+      "to": "cross-review-r2-u0",
+      "when": {
+        "field": "reward-hack-review-r2-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "cross-review-r2-u0",
+      "to": "milestone-review-r2-u0",
+      "when": {
+        "field": "cross-review-r2-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "exhaust-revision-r2-u0-implementation",
+      "to": "unresolved"
+    },
+    {
+      "from": "reward-hack-review-r2-u0",
+      "to": "record-reward-hack-review-r2-u0",
+      "when": {
+        "field": "reward-hack-review-r2-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-reward-hack-review-r2-u0",
+      "to": "exhaust-revision-r2-u0-implementation"
+    },
+    {
+      "from": "cross-review-r2-u0",
+      "to": "record-cross-review-r2-u0",
+      "when": {
+        "field": "cross-review-r2-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-cross-review-r2-u0",
+      "to": "exhaust-revision-r2-u0-implementation"
+    },
+    {
+      "from": "milestone-review-r2-u0",
+      "to": "record-milestone-review-r2-u0",
+      "when": {
+        "field": "milestone-review-r2-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-milestone-review-r2-u0",
+      "to": "exhaust-revision-r2-u0-implementation"
+    },
+    {
+      "from": "milestone-review-r2-u0",
+      "to": "self-evolve-a-r2-u0",
+      "when": {
+        "field": "milestone-review-r2-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "self-evolve-a-r2-u0",
+      "to": "validate-lemmas-a-r2-u0"
+    },
+    {
+      "from": "validate-lemmas-a-r2-u0",
+      "to": "evolve-review-a-r2-u0"
+    },
+    {
+      "from": "evolve-review-a-r2-u0",
+      "to": "capture-final-evidence-a-r2-u0",
+      "when": {
+        "field": "evolve-review-a-r2-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "capture-final-evidence-a-r2-u0",
+      "to": "final-reward-hack-review-a-r2-u0"
+    },
+    {
+      "from": "final-reward-hack-review-a-r2-u0",
+      "to": "archive-proof",
+      "when": {
+        "field": "final-reward-hack-review-a-r2-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "final-reward-hack-review-a-r2-u0",
+      "to": "record-final-reward-hack-review-a-r2-u0",
+      "when": {
+        "field": "final-reward-hack-review-a-r2-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "exhaust-revision-r2-u0-final-a",
+      "to": "unresolved"
+    },
+    {
+      "from": "record-final-reward-hack-review-a-r2-u0",
+      "to": "exhaust-revision-r2-u0-final-a"
+    },
+    {
+      "from": "evolve-review-a-r2-u0",
+      "to": "record-evolve-review-a-r2-u0",
+      "when": {
+        "field": "evolve-review-a-r2-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-evolve-review-a-r2-u0",
+      "to": "consume-evolution-retry-r2-u0"
+    },
+    {
+      "from": "consume-evolution-retry-r2-u0",
+      "to": "self-evolve-b-r2-u0"
+    },
+    {
+      "from": "self-evolve-b-r2-u0",
+      "to": "validate-lemmas-b-r2-u0"
+    },
+    {
+      "from": "validate-lemmas-b-r2-u0",
+      "to": "evolve-review-b-r2-u0"
+    },
+    {
+      "from": "evolve-review-b-r2-u0",
+      "to": "capture-final-evidence-b-r2-u0",
+      "when": {
+        "field": "evolve-review-b-r2-u0.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "capture-final-evidence-b-r2-u0",
+      "to": "final-reward-hack-review-b-r2-u0"
+    },
+    {
+      "from": "final-reward-hack-review-b-r2-u0",
+      "to": "archive-proof",
+      "when": {
+        "field": "final-reward-hack-review-b-r2-u0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "evolve-review-b-r2-u0",
+      "to": "record-evolve-review-b-r2-u0",
+      "when": {
+        "field": "evolve-review-b-r2-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-evolve-review-b-r2-u0",
+      "to": "exhaust-evolution-r2-u0-b"
+    },
+    {
+      "from": "exhaust-evolution-r2-u0-b",
+      "to": "unresolved"
+    },
+    {
+      "from": "final-reward-hack-review-b-r2-u0",
+      "to": "record-final-reward-hack-review-b-r2-u0",
+      "when": {
+        "field": "final-reward-hack-review-b-r2-u0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "exhaust-revision-r2-u0-final-b",
+      "to": "unresolved"
+    },
+    {
+      "from": "record-final-reward-hack-review-b-r2-u0",
+      "to": "exhaust-revision-r2-u0-final-b"
+    },
+    {
+      "from": "implement-r1-u1",
+      "to": "capture-evidence-r1-u1"
+    },
+    {
+      "from": "capture-evidence-r1-u1",
+      "to": "reward-hack-review-r1-u1"
+    },
+    {
+      "from": "reward-hack-review-r1-u1",
+      "to": "cross-review-r1-u1",
+      "when": {
+        "field": "reward-hack-review-r1-u1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "cross-review-r1-u1",
+      "to": "milestone-review-r1-u1",
+      "when": {
+        "field": "cross-review-r1-u1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "advance-revision-r1-u1-implementation",
+      "to": "implement-r2-u1"
+    },
+    {
+      "from": "reward-hack-review-r1-u1",
+      "to": "record-reward-hack-review-r1-u1",
+      "when": {
+        "field": "reward-hack-review-r1-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-reward-hack-review-r1-u1",
+      "to": "advance-revision-r1-u1-implementation"
+    },
+    {
+      "from": "cross-review-r1-u1",
+      "to": "record-cross-review-r1-u1",
+      "when": {
+        "field": "cross-review-r1-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-cross-review-r1-u1",
+      "to": "advance-revision-r1-u1-implementation"
+    },
+    {
+      "from": "milestone-review-r1-u1",
+      "to": "record-milestone-review-r1-u1",
+      "when": {
+        "field": "milestone-review-r1-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-milestone-review-r1-u1",
+      "to": "advance-revision-r1-u1-implementation"
+    },
+    {
+      "from": "milestone-review-r1-u1",
+      "to": "self-evolve-a-r1-u1",
+      "when": {
+        "field": "milestone-review-r1-u1.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "self-evolve-a-r1-u1",
+      "to": "validate-lemmas-a-r1-u1"
+    },
+    {
+      "from": "validate-lemmas-a-r1-u1",
+      "to": "evolve-review-a-r1-u1"
+    },
+    {
+      "from": "evolve-review-a-r1-u1",
+      "to": "capture-final-evidence-a-r1-u1",
+      "when": {
+        "field": "evolve-review-a-r1-u1.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "capture-final-evidence-a-r1-u1",
+      "to": "final-reward-hack-review-a-r1-u1"
+    },
+    {
+      "from": "final-reward-hack-review-a-r1-u1",
+      "to": "archive-proof",
+      "when": {
+        "field": "final-reward-hack-review-a-r1-u1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "final-reward-hack-review-a-r1-u1",
+      "to": "record-final-reward-hack-review-a-r1-u1",
+      "when": {
+        "field": "final-reward-hack-review-a-r1-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "advance-revision-r1-u1-final-a",
+      "to": "implement-r2-u1"
+    },
+    {
+      "from": "record-final-reward-hack-review-a-r1-u1",
+      "to": "advance-revision-r1-u1-final-a"
+    },
+    {
+      "from": "evolve-review-a-r1-u1",
+      "to": "record-evolve-review-a-r1-u1",
+      "when": {
+        "field": "evolve-review-a-r1-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-evolve-review-a-r1-u1",
+      "to": "exhaust-evolution-r1-u1-a"
+    },
+    {
+      "from": "exhaust-evolution-r1-u1-a",
+      "to": "unresolved"
+    },
+    {
+      "from": "implement-r2-u1",
+      "to": "capture-evidence-r2-u1"
+    },
+    {
+      "from": "capture-evidence-r2-u1",
+      "to": "reward-hack-review-r2-u1"
+    },
+    {
+      "from": "reward-hack-review-r2-u1",
+      "to": "cross-review-r2-u1",
+      "when": {
+        "field": "reward-hack-review-r2-u1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "cross-review-r2-u1",
+      "to": "milestone-review-r2-u1",
+      "when": {
+        "field": "cross-review-r2-u1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "exhaust-revision-r2-u1-implementation",
+      "to": "unresolved"
+    },
+    {
+      "from": "reward-hack-review-r2-u1",
+      "to": "record-reward-hack-review-r2-u1",
+      "when": {
+        "field": "reward-hack-review-r2-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-reward-hack-review-r2-u1",
+      "to": "exhaust-revision-r2-u1-implementation"
+    },
+    {
+      "from": "cross-review-r2-u1",
+      "to": "record-cross-review-r2-u1",
+      "when": {
+        "field": "cross-review-r2-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-cross-review-r2-u1",
+      "to": "exhaust-revision-r2-u1-implementation"
+    },
+    {
+      "from": "milestone-review-r2-u1",
+      "to": "record-milestone-review-r2-u1",
+      "when": {
+        "field": "milestone-review-r2-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-milestone-review-r2-u1",
+      "to": "exhaust-revision-r2-u1-implementation"
+    },
+    {
+      "from": "milestone-review-r2-u1",
+      "to": "self-evolve-a-r2-u1",
+      "when": {
+        "field": "milestone-review-r2-u1.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "self-evolve-a-r2-u1",
+      "to": "validate-lemmas-a-r2-u1"
+    },
+    {
+      "from": "validate-lemmas-a-r2-u1",
+      "to": "evolve-review-a-r2-u1"
+    },
+    {
+      "from": "evolve-review-a-r2-u1",
+      "to": "capture-final-evidence-a-r2-u1",
+      "when": {
+        "field": "evolve-review-a-r2-u1.verdict",
+        "equals": "APPROVE"
+      }
+    },
+    {
+      "from": "capture-final-evidence-a-r2-u1",
+      "to": "final-reward-hack-review-a-r2-u1"
+    },
+    {
+      "from": "final-reward-hack-review-a-r2-u1",
+      "to": "archive-proof",
+      "when": {
+        "field": "final-reward-hack-review-a-r2-u1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "final-reward-hack-review-a-r2-u1",
+      "to": "record-final-reward-hack-review-a-r2-u1",
+      "when": {
+        "field": "final-reward-hack-review-a-r2-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "exhaust-revision-r2-u1-final-a",
+      "to": "unresolved"
+    },
+    {
+      "from": "record-final-reward-hack-review-a-r2-u1",
+      "to": "exhaust-revision-r2-u1-final-a"
+    },
+    {
+      "from": "evolve-review-a-r2-u1",
+      "to": "record-evolve-review-a-r2-u1",
+      "when": {
+        "field": "evolve-review-a-r2-u1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "record-evolve-review-a-r2-u1",
+      "to": "exhaust-evolution-r2-u1-a"
+    },
+    {
+      "from": "exhaust-evolution-r2-u1-a",
+      "to": "unresolved"
+    },
+    {
+      "from": "archive-proof",
+      "to": "success"
+    }
+  ],
+  "terminals": {
+    "success": "success",
+    "unresolved": "unresolved"
+  },
+  "sideEffects": [
+    {
+      "owner": "capture-baseline",
+      "effect": "controller-owned baseline artifact under the run directory",
+      "recovery": "Reconcile by stable run and node id and verify the frozen baseline digest before reuse."
+    },
+    {
+      "owner": "implement-r0-u0 and statically unrolled implementation nodes",
+      "effect": "target workspace writes",
+      "recovery": "Reconcile current bytes against the frozen baseline before authorizing a new bounded attempt."
+    },
+    {
+      "owner": "capture-evidence and capture-final-evidence nodes",
+      "effect": "controller-owned acceptance and byte-evidence artifacts under the run directory",
+      "recovery": "Treat an interrupted capture as ambiguous; verify the exact artifact digest before continuing."
+    },
+    {
+      "owner": "self-evolve nodes",
+      "effect": "reviewed framework, skill, agent, flow, lemma, or memory writes",
+      "recovery": "Validate the claimed lemma state and review the actual byte diff before continuing."
+    },
+    {
+      "owner": "archive-proof",
+      "effect": "controller-owned proof-candidate marker only; it does not write or claim the protected PM proof",
+      "recovery": "The controller verifies the terminal, final review, evidence, and frozen bytes before idempotent proof finalization."
+    }
+  ],
+  "evidence": [
+    "pre-write root and nested-workspace byte baseline path, digest, and summary",
+    "post-implementation mechanical acceptance and byte evidence for every traversal",
+    "independent reward-hacking verdict over the implementation and its evidence capture",
+    "independent implementation verdict",
+    "independent first-principles milestone verdict",
+    "deterministic lemma validation",
+    "independent self-evolution verdict with one global retry across all traversals",
+    "final post-write byte evidence and reward-hacking verdict over every causal final-byte writer",
+    "controller-created proof candidate and controller-finalized state-bound completion proof"
+  ]
+}

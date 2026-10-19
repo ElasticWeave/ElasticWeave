@@ -1,0 +1,74 @@
+{
+  "name": "writeup-human-cleanup",
+  "version": "0.2.0",
+  "files": [
+    {
+      "path": "INDEX.md",
+      "bytes": 1114
+    },
+    {
+      "path": "README.md",
+      "bytes": 2856
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 15277
+    },
+    {
+      "path": "references/anti-slop-patterns.md",
+      "bytes": 2427
+    },
+    {
+      "path": "references/before-after-examples.md",
+      "bytes": 3292
+    },
+    {
+      "path": "references/cleanup-rules.md",
+      "bytes": 3129
+    },
+    {
+      "path": "references/distilled-from-git-changes.md",
+      "bytes": 6084
+    },
+    {
+      "path": "references/fact-density-and-metaphor.md",
+      "bytes": 6054
+    },
+    {
+      "path": "references/readme-cleanup.md",
+      "bytes": 1889
+    },
+    {
+      "path": "references/report-cleanup.md",
+      "bytes": 2331
+    },
+    {
+      "path": "references/scorecard.md",
+      "bytes": 2186
+    },
+    {
+      "path": "samples/ai-readme-before.md",
+      "bytes": 609
+    },
+    {
+      "path": "samples/ai-report-before.md",
+      "bytes": 481
+    },
+    {
+      "path": "samples/human-readme-after.md",
+      "bytes": 547
+    },
+    {
+      "path": "samples/human-report-after.md",
+      "bytes": 495
+    },
+    {
+      "path": "test-prompts.json",
+      "bytes": 6201
+    },
+    {
+      "path": "validate_pack.py",
+      "bytes": 3106
+    }
+  ]
+}

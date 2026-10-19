@@ -1,0 +1,43 @@
+{
+  "schema": "subagent-workflow/v1",
+  "designPath": ".workflow/designs/subagent-scheduler-smoke.workflow.json",
+  "designSha256": "fc601586f4f4bae9e51b11f038f0ce14cbf3934f932f418846c02ee78f89bb88",
+  "inputPath": ".subagent/fixtures/subagent-scheduler-smoke.input.json",
+  "reasoningPosture": "balanced",
+  "scheduler": {
+    "role": "smol",
+    "mode": "ambiguous-only",
+    "maxCalls": 1,
+    "timeoutSeconds": 120,
+    "reads": []
+  },
+  "handlers": {
+    "seed": {
+      "type": "input",
+      "bindings": {
+        "topic": "topic"
+      }
+    },
+    "scout-a": {
+      "type": "agent",
+      "prompt": "Analyze the following topic from the perspective of mechanism and implementation constraints. Do not edit files. Topic: {{topic}}"
+    },
+    "scout-b": {
+      "type": "agent",
+      "prompt": "Analyze the following topic from the perspective of failure modes and counterexamples. Do not edit files. Topic: {{topic}}"
+    },
+    "merge": {
+      "type": "template",
+      "values": {
+        "combined": "MECHANISM:\n{{summaryA}}\n\nFAILURE MODES:\n{{summaryB}}",
+        "mergeStatus": "PASS"
+      }
+    },
+    "success": {
+      "type": "terminal"
+    },
+    "unresolved": {
+      "type": "terminal"
+    }
+  }
+}

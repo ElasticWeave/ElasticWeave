@@ -1,0 +1,79 @@
+{
+  "schema": "subagent-resource-closure/v1",
+  "designId": "review-gated-loop",
+  "resources": [
+    {
+      "path": ".workflow/resources/review-gated-loop/implement.md",
+      "sha256": "a04af5260f455745e4f7897c51a20ac75a07d7f7e3582b4a89163b523a5b567c",
+      "usedBy": [
+        "implement-r0",
+        "implement-r1",
+        "implement-r2"
+      ]
+    },
+    {
+      "path": ".workflow/resources/review-gated-loop/review.md",
+      "sha256": "ca055f3eda1339f639605da84f5190578714db3ee51095364e19254fe25c9f44",
+      "usedBy": [
+        "review-r0",
+        "review-r1",
+        "review-r2"
+      ]
+    }
+  ],
+  "deterministicDependencies": [
+    {
+      "path": ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+      "sha256": "32a1190a3e5df82763bb539de7d4c8677a90435306ea6c5cabde1c99458bc343",
+      "usedBy": [
+        "capture-baseline",
+        "capture-evidence-r0",
+        "capture-evidence-r1",
+        "capture-evidence-r2",
+        "controller-finalization"
+      ]
+    },
+    {
+      "path": ".claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+      "sha256": "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+      "usedBy": [
+        "capture-baseline",
+        "capture-evidence-r0",
+        "capture-evidence-r1",
+        "capture-evidence-r2",
+        "controller-finalization"
+      ]
+    }
+  ],
+  "externalExecutables": [
+    {
+      "label": "controller-runtime",
+      "source": "controller-runtime"
+    },
+    {
+      "label": "python",
+      "source": "path",
+      "command": "python3"
+    },
+    {
+      "label": "git",
+      "source": "path",
+      "command": "git"
+    },
+    {
+      "label": "native-task",
+      "source": "native-role",
+      "role": "task"
+    },
+    {
+      "label": "native-advisor",
+      "source": "native-role",
+      "role": "advisor"
+    }
+  ],
+  "notes": [
+    "The mapping and controller freeze these project bytes at run start and reject drift on resume.",
+    "External executable sources are portable declarations; controller preflight resolves and freezes canonical path and byte identity for the run.",
+    "This manifest describes dependencies; it does not grant protected-write authority or assert a successful run."
+  ]
+}

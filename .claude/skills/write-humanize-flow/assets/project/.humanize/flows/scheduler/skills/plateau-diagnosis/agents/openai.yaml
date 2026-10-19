@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plateau Diagnosis"
+  short_description: "Diagnose a real task plateau without startup hardening"
+  default_prompt: "Use $plateau-diagnosis only after task evidence proves a plateau; reconstruct scoped history, search current primary papers and official projects, audit reward hacking or harness distortion, and return one discriminating next step."

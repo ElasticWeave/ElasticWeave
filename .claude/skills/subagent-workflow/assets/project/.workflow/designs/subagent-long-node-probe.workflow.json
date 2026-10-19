@@ -1,0 +1,59 @@
+{
+  "schema": "workflow-design/v1",
+  "id": "subagent-long-node-probe",
+  "entry": "sleep-probe",
+  "goal": {
+    "objective": "Verify that the built-in controller permits an explicitly bounded node to run longer than 600 seconds.",
+    "acceptance": "The 605-second command completes before its 620-second node deadline and reaches success."
+  },
+  "admission": {
+    "reasons": ["long-running-repeatability", "lifecycle-boundary"],
+    "demotionCondition": "Keep only the short fault tests after the no-watchdog property is independently established."
+  },
+  "governance": {
+    "reviewPolicy": "independent",
+    "completionProof": "none",
+    "malformedDecision": "unresolved"
+  },
+  "budgets": {
+    "maxModelCalls": 1,
+    "maxWallTimeSeconds": 660
+  },
+  "requiredCapabilities": ["conditional-routing", "durable-checkpoints", "observability"],
+  "state": [
+    {"name": "probeStatus", "type": "string", "source": "sleep-probe"}
+  ],
+  "nodes": [
+    {
+      "id": "sleep-probe",
+      "kind": "script",
+      "reads": [],
+      "writes": ["probeStatus"],
+      "timeoutSeconds": 620
+    },
+    {
+      "id": "success",
+      "kind": "terminal",
+      "outcome": "success",
+      "reads": ["probeStatus"],
+      "writes": []
+    },
+    {
+      "id": "unresolved",
+      "kind": "terminal",
+      "outcome": "unresolved",
+      "reads": [],
+      "writes": []
+    }
+  ],
+  "transitions": [
+    {"from": "sleep-probe", "to": "success", "when": {"field": "probeStatus", "equals": "PASS"}},
+    {"from": "sleep-probe", "to": "unresolved", "when": {"field": "probeStatus", "equals": "BLOCK"}}
+  ],
+  "terminals": {
+    "success": "success",
+    "unresolved": "unresolved"
+  },
+  "sideEffects": [],
+  "evidence": ["command response bytes", "event timestamps", "atomic controller checkpoint", "terminal result"]
+}

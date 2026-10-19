@@ -1,0 +1,1217 @@
+{
+  "schema": "workflow-design/v1",
+  "id": "simplify-verify-loop",
+  "entry": "seed",
+  "admission": {
+    "reasons": [
+      "multi-stage",
+      "fanout-fanin",
+      "lifecycle-boundary"
+    ],
+    "demotionCondition": "Use one bounded writer and one independent reviewer when three distinct verification perspectives and bounded revision rounds are unnecessary."
+  },
+  "governance": {
+    "reviewPolicy": "independent",
+    "completionProof": "none",
+    "malformedDecision": "unresolved"
+  },
+  "goal": {
+    "objective": "Remove unnecessary complexity from a real candidate while preserving its required behavior and claims.",
+    "acceptance": "A candidate is ready only when its actual artifact, change report, acceptance output, and three independent review artifacts are bound as evidence and all three reviewers pass the same round."
+  },
+  "budgets": {
+    "maxModelCalls": 15
+  },
+  "requiredCapabilities": [
+    "agent-invocation",
+    "fresh-sessions",
+    "conditional-routing",
+    "structured-output",
+    "fanout-fanin",
+    "durable-checkpoints",
+    "observability"
+  ],
+  "state": [
+    {
+      "name": "itemId",
+      "type": "string",
+      "source": "input"
+    },
+    {
+      "name": "task",
+      "type": "string",
+      "source": "input"
+    },
+    {
+      "name": "acceptanceArgv",
+      "type": "array",
+      "source": "input"
+    },
+    {
+      "name": "workProductPath",
+      "type": "string",
+      "source": "input"
+    },
+    {
+      "name": "baselinePath",
+      "type": "string",
+      "source": "capture-baseline"
+    },
+    {
+      "name": "baselineDigest",
+      "type": "string",
+      "source": "capture-baseline"
+    },
+    {
+      "name": "roundNumber",
+      "type": "number",
+      "source": "workflow"
+    },
+    {
+      "name": "simplifyPlan",
+      "type": "object",
+      "source": "workflow"
+    },
+    {
+      "name": "planArtifactPath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "candidateSummary",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "candidateArtifactPath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "candidateDigest",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "changeArtifactPath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "changeArtifactDigest",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "acceptanceOutputPath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "acceptanceOutputDigest",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "correctnessVerdict",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "correctnessReviewPath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "maintainabilityVerdict",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "maintainabilityReviewPath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "diversityVerdict",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "diversityReviewPath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "roundStatus",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "reductionFeedback",
+      "type": "object",
+      "source": "workflow"
+    },
+    {
+      "name": "finalEvidenceManifest",
+      "type": "string",
+      "source": "prepare-candidate"
+    },
+    {
+      "name": "forcedReason",
+      "type": "string",
+      "source": "controller"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "seed",
+      "kind": "script",
+      "reads": [],
+      "writes": [
+        "itemId",
+        "task",
+        "acceptanceArgv",
+        "workProductPath",
+        "roundNumber",
+        "forcedReason"
+      ]
+    },
+    {
+      "id": "capture-baseline",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "workProductPath"
+      ],
+      "writes": [
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "timeoutSeconds": 900
+    },
+    {
+      "id": "plan-r1",
+      "kind": "agent",
+      "role": "simplify-planner",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "workProductPath",
+        "baselinePath",
+        "baselineDigest",
+        "roundNumber"
+      ],
+      "writes": [
+        "simplifyPlan",
+        "planArtifactPath"
+      ],
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "write-r1",
+      "kind": "agent",
+      "role": "simplify-writer",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "workProductPath",
+        "baselineDigest",
+        "simplifyPlan",
+        "planArtifactPath",
+        "roundNumber"
+      ],
+      "writes": [
+        "candidateSummary",
+        "candidateArtifactPath",
+        "changeArtifactPath"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-evidence-r1",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest",
+        "candidateArtifactPath",
+        "changeArtifactPath"
+      ],
+      "writes": [
+        "candidateDigest",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-correctness-r1",
+      "kind": "decision",
+      "role": "verify-correctness",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "correctnessVerdict",
+        "correctnessReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r1",
+        "capture-evidence-r1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-maintainability-r1",
+      "kind": "decision",
+      "role": "verify-maintainability",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "maintainabilityVerdict",
+        "maintainabilityReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r1",
+        "capture-evidence-r1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-diversity-r1",
+      "kind": "decision",
+      "role": "verify-diversity",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "diversityVerdict",
+        "diversityReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r1",
+        "capture-evidence-r1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "reduce-r1",
+      "kind": "reducer",
+      "waitFor": [
+        "verify-correctness-r1",
+        "verify-maintainability-r1",
+        "verify-diversity-r1"
+      ],
+      "reads": [
+        "candidateDigest",
+        "changeArtifactDigest",
+        "acceptanceOutputDigest",
+        "correctnessVerdict",
+        "correctnessReviewPath",
+        "maintainabilityVerdict",
+        "maintainabilityReviewPath",
+        "diversityVerdict",
+        "diversityReviewPath"
+      ],
+      "writes": [
+        "roundStatus",
+        "reductionFeedback",
+        "roundNumber"
+      ],
+      "contract": "Emit PASS only when all three evidence-bound verdicts are PASS. Emit UNRESOLVED if any required artifact or verdict is unavailable or malformed. Otherwise emit REVISE with all concrete findings.",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "plan-r2",
+      "kind": "agent",
+      "role": "simplify-planner",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "workProductPath",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "changeArtifactPath",
+        "acceptanceOutputPath",
+        "reductionFeedback",
+        "roundNumber"
+      ],
+      "writes": [
+        "simplifyPlan",
+        "planArtifactPath"
+      ],
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "write-r2",
+      "kind": "agent",
+      "role": "simplify-writer",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "workProductPath",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "simplifyPlan",
+        "planArtifactPath",
+        "reductionFeedback",
+        "roundNumber"
+      ],
+      "writes": [
+        "candidateSummary",
+        "candidateArtifactPath",
+        "changeArtifactPath"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-evidence-r2",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest",
+        "candidateArtifactPath",
+        "changeArtifactPath"
+      ],
+      "writes": [
+        "candidateDigest",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-correctness-r2",
+      "kind": "decision",
+      "role": "verify-correctness",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "correctnessVerdict",
+        "correctnessReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r2",
+        "capture-evidence-r2"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-maintainability-r2",
+      "kind": "decision",
+      "role": "verify-maintainability",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "maintainabilityVerdict",
+        "maintainabilityReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r2",
+        "capture-evidence-r2"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-diversity-r2",
+      "kind": "decision",
+      "role": "verify-diversity",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "diversityVerdict",
+        "diversityReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r2",
+        "capture-evidence-r2"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "reduce-r2",
+      "kind": "reducer",
+      "waitFor": [
+        "verify-correctness-r2",
+        "verify-maintainability-r2",
+        "verify-diversity-r2"
+      ],
+      "reads": [
+        "candidateDigest",
+        "changeArtifactDigest",
+        "acceptanceOutputDigest",
+        "correctnessVerdict",
+        "correctnessReviewPath",
+        "maintainabilityVerdict",
+        "maintainabilityReviewPath",
+        "diversityVerdict",
+        "diversityReviewPath"
+      ],
+      "writes": [
+        "roundStatus",
+        "reductionFeedback",
+        "roundNumber"
+      ],
+      "contract": "Emit PASS only when all three evidence-bound verdicts are PASS. Emit UNRESOLVED if any required artifact or verdict is unavailable or malformed. Otherwise emit REVISE with all concrete findings.",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "plan-r3",
+      "kind": "agent",
+      "role": "simplify-planner",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "workProductPath",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "changeArtifactPath",
+        "acceptanceOutputPath",
+        "reductionFeedback",
+        "roundNumber"
+      ],
+      "writes": [
+        "simplifyPlan",
+        "planArtifactPath"
+      ],
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "write-r3",
+      "kind": "agent",
+      "role": "simplify-writer",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "workProductPath",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "simplifyPlan",
+        "planArtifactPath",
+        "reductionFeedback",
+        "roundNumber"
+      ],
+      "writes": [
+        "candidateSummary",
+        "candidateArtifactPath",
+        "changeArtifactPath"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-evidence-r3",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest",
+        "candidateArtifactPath",
+        "changeArtifactPath"
+      ],
+      "writes": [
+        "candidateDigest",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-correctness-r3",
+      "kind": "decision",
+      "role": "verify-correctness",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "correctnessVerdict",
+        "correctnessReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r3",
+        "capture-evidence-r3"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-maintainability-r3",
+      "kind": "decision",
+      "role": "verify-maintainability",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "maintainabilityVerdict",
+        "maintainabilityReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r3",
+        "capture-evidence-r3"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "verify-diversity-r3",
+      "kind": "decision",
+      "role": "verify-diversity",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "baselineDigest",
+        "candidateSummary",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest"
+      ],
+      "writes": [
+        "diversityVerdict",
+        "diversityReviewPath"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "UNRESOLVED"
+      ],
+      "reviews": [
+        "write-r3",
+        "capture-evidence-r3"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 3600
+    },
+    {
+      "id": "reduce-r3",
+      "kind": "reducer",
+      "waitFor": [
+        "verify-correctness-r3",
+        "verify-maintainability-r3",
+        "verify-diversity-r3"
+      ],
+      "reads": [
+        "candidateDigest",
+        "changeArtifactDigest",
+        "acceptanceOutputDigest",
+        "correctnessVerdict",
+        "correctnessReviewPath",
+        "maintainabilityVerdict",
+        "maintainabilityReviewPath",
+        "diversityVerdict",
+        "diversityReviewPath"
+      ],
+      "writes": [
+        "roundStatus",
+        "reductionFeedback",
+        "roundNumber"
+      ],
+      "contract": "Emit PASS only when all three evidence-bound verdicts are PASS. Emit UNRESOLVED if any required artifact or verdict is unavailable or malformed. Otherwise emit REVISE with all concrete findings.",
+      "timeoutSeconds": 900
+    },
+    {
+      "id": "exhaust-rounds",
+      "kind": "script",
+      "reads": [
+        "roundNumber",
+        "roundStatus",
+        "reductionFeedback"
+      ],
+      "writes": [
+        "forcedReason"
+      ],
+      "contract": "Record that the three-round cap was reached with unresolved revision findings; never convert exhaustion into success."
+    },
+    {
+      "id": "prepare-candidate",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "itemId",
+        "baselinePath",
+        "baselineDigest",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest",
+        "correctnessReviewPath",
+        "maintainabilityReviewPath",
+        "diversityReviewPath",
+        "roundStatus"
+      ],
+      "writes": [
+        "finalEvidenceManifest"
+      ],
+      "contract": "Bind the exact candidate, change, acceptance, and three review artifacts for the outer independent terminal reviewer.",
+      "timeoutSeconds": 900
+    },
+    {
+      "id": "candidate-ready",
+      "kind": "terminal",
+      "outcome": "success",
+      "reads": [
+        "itemId",
+        "candidateArtifactPath",
+        "candidateDigest",
+        "changeArtifactPath",
+        "changeArtifactDigest",
+        "acceptanceOutputPath",
+        "acceptanceOutputDigest",
+        "correctnessReviewPath",
+        "maintainabilityReviewPath",
+        "diversityReviewPath",
+        "finalEvidenceManifest"
+      ],
+      "writes": []
+    },
+    {
+      "id": "unresolved",
+      "kind": "terminal",
+      "outcome": "unresolved",
+      "reads": [
+        "roundNumber",
+        "roundStatus",
+        "reductionFeedback",
+        "forcedReason"
+      ],
+      "writes": []
+    }
+  ],
+  "transitions": [
+    {
+      "from": "seed",
+      "to": "capture-baseline"
+    },
+    {
+      "from": "capture-baseline",
+      "to": "plan-r1"
+    },
+    {
+      "from": "plan-r1",
+      "to": "write-r1"
+    },
+    {
+      "from": "write-r1",
+      "to": "capture-evidence-r1"
+    },
+    {
+      "from": "capture-evidence-r1",
+      "to": "verify-correctness-r1"
+    },
+    {
+      "from": "capture-evidence-r1",
+      "to": "verify-maintainability-r1"
+    },
+    {
+      "from": "capture-evidence-r1",
+      "to": "verify-diversity-r1"
+    },
+    {
+      "from": "verify-correctness-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-correctness-r1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-correctness-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-correctness-r1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-correctness-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-correctness-r1.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "verify-maintainability-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-maintainability-r1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-maintainability-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-maintainability-r1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-maintainability-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-maintainability-r1.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "verify-diversity-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-diversity-r1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-diversity-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-diversity-r1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-diversity-r1",
+      "to": "reduce-r1",
+      "when": {
+        "field": "verify-diversity-r1.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "reduce-r1",
+      "to": "prepare-candidate",
+      "when": {
+        "field": "roundStatus",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "reduce-r1",
+      "to": "plan-r2",
+      "when": {
+        "field": "roundStatus",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "reduce-r1",
+      "to": "unresolved",
+      "when": {
+        "field": "roundStatus",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "plan-r2",
+      "to": "write-r2"
+    },
+    {
+      "from": "write-r2",
+      "to": "capture-evidence-r2"
+    },
+    {
+      "from": "capture-evidence-r2",
+      "to": "verify-correctness-r2"
+    },
+    {
+      "from": "capture-evidence-r2",
+      "to": "verify-maintainability-r2"
+    },
+    {
+      "from": "capture-evidence-r2",
+      "to": "verify-diversity-r2"
+    },
+    {
+      "from": "verify-correctness-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-correctness-r2.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-correctness-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-correctness-r2.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-correctness-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-correctness-r2.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "verify-maintainability-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-maintainability-r2.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-maintainability-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-maintainability-r2.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-maintainability-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-maintainability-r2.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "verify-diversity-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-diversity-r2.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-diversity-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-diversity-r2.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-diversity-r2",
+      "to": "reduce-r2",
+      "when": {
+        "field": "verify-diversity-r2.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "reduce-r2",
+      "to": "prepare-candidate",
+      "when": {
+        "field": "roundStatus",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "reduce-r2",
+      "to": "plan-r3",
+      "when": {
+        "field": "roundStatus",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "reduce-r2",
+      "to": "unresolved",
+      "when": {
+        "field": "roundStatus",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "plan-r3",
+      "to": "write-r3"
+    },
+    {
+      "from": "write-r3",
+      "to": "capture-evidence-r3"
+    },
+    {
+      "from": "capture-evidence-r3",
+      "to": "verify-correctness-r3"
+    },
+    {
+      "from": "capture-evidence-r3",
+      "to": "verify-maintainability-r3"
+    },
+    {
+      "from": "capture-evidence-r3",
+      "to": "verify-diversity-r3"
+    },
+    {
+      "from": "verify-correctness-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-correctness-r3.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-correctness-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-correctness-r3.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-correctness-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-correctness-r3.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "verify-maintainability-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-maintainability-r3.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-maintainability-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-maintainability-r3.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-maintainability-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-maintainability-r3.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "verify-diversity-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-diversity-r3.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "verify-diversity-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-diversity-r3.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "verify-diversity-r3",
+      "to": "reduce-r3",
+      "when": {
+        "field": "verify-diversity-r3.verdict",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "reduce-r3",
+      "to": "prepare-candidate",
+      "when": {
+        "field": "roundStatus",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "reduce-r3",
+      "to": "exhaust-rounds",
+      "when": {
+        "field": "roundStatus",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "reduce-r3",
+      "to": "unresolved",
+      "when": {
+        "field": "roundStatus",
+        "equals": "UNRESOLVED"
+      }
+    },
+    {
+      "from": "exhaust-rounds",
+      "to": "unresolved"
+    },
+    {
+      "from": "prepare-candidate",
+      "to": "candidate-ready"
+    }
+  ],
+  "terminals": {
+    "success": "candidate-ready",
+    "unresolved": "unresolved"
+  }
+}

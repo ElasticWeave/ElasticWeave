@@ -1,0 +1,1299 @@
+{
+  "schema": "subagent-workflow/v1",
+  "designPath": ".workflow/designs/standard-round.workflow.json",
+  "designSha256": "5dfecfa9ffdb430a7dfe083b78c42029d10416f2a79d467fe96253474fc06992",
+  "inputPath": ".subagent/fixtures/standard-round.input.json",
+  "reasoningPosture": "balanced",
+  "scheduler": {
+    "role": "task",
+    "mode": "ambiguous-only",
+    "maxCalls": 0,
+    "timeoutSeconds": 7200,
+    "reads": []
+  },
+  "proof": {
+    "itemIdField": "itemId",
+    "evidencePathField": "evidencePath",
+    "evidenceDigestField": "evidenceDigest",
+    "helperPath": ".claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+    "resourcesManifestPath": ".workflow/resources/standard-round/resources.json",
+    "resources": {
+      "mapping-builder": ".workflow/resources/standard-round/build_mapping.mjs",
+      "prompt-implement": ".workflow/resources/standard-round/prompts/implement.md",
+      "prompt-reward": ".workflow/resources/standard-round/prompts/reward-hacking-review.md",
+      "prompt-cross": ".workflow/resources/standard-round/prompts/cross-review.md",
+      "prompt-milestone": ".workflow/resources/standard-round/prompts/milestone-review.md",
+      "prompt-self-evolve": ".workflow/resources/standard-round/prompts/self-evolve.md",
+      "prompt-evolve-review": ".workflow/resources/standard-round/prompts/evolve-review.md",
+      "lemma-action": ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+      "lemma-validator": ".claude/skills/self-improve/scripts/validate_lemmas.py"
+    },
+    "finalReviewNodes": [
+      "final-reward-hack-review-a-r0-u0",
+      "final-reward-hack-review-b-r0-u0",
+      "final-reward-hack-review-a-r1-u0",
+      "final-reward-hack-review-b-r1-u0",
+      "final-reward-hack-review-a-r2-u0",
+      "final-reward-hack-review-b-r2-u0",
+      "final-reward-hack-review-a-r1-u1",
+      "final-reward-hack-review-a-r2-u1"
+    ],
+    "evidenceProducerNodes": [
+      "capture-final-evidence-a-r0-u0",
+      "capture-final-evidence-b-r0-u0",
+      "capture-final-evidence-a-r1-u0",
+      "capture-final-evidence-b-r1-u0",
+      "capture-final-evidence-a-r2-u0",
+      "capture-final-evidence-b-r2-u0",
+      "capture-final-evidence-a-r1-u1",
+      "capture-final-evidence-a-r2-u1"
+    ],
+    "currentStateTimeoutSeconds": 7200,
+    "actionPath": ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+    "executables": {
+      "controller-runtime": {
+        "source": "controller-runtime"
+      },
+      "python": {
+        "source": "path",
+        "command": "python3"
+      },
+      "git": {
+        "source": "path",
+        "command": "git"
+      },
+      "native-task": {
+        "source": "native-role",
+        "role": "task"
+      },
+      "native-plan": {
+        "source": "native-role",
+        "role": "plan"
+      },
+      "native-advisor": {
+        "source": "native-role",
+        "role": "advisor"
+      }
+    }
+  },
+  "handlers": {
+    "seed": {
+      "type": "input",
+      "bindings": {
+        "itemId": "itemId",
+        "task": "task",
+        "acceptanceArgv": "acceptanceArgv",
+        "rewardHackingRisks": "rewardHackingRisks",
+        "report": {
+          "const": ""
+        },
+        "reviseCount": {
+          "const": 0
+        },
+        "evolveCount": {
+          "const": 0
+        },
+        "evolutionRetryUsed": {
+          "const": false
+        },
+        "reviewFeedback": {
+          "const": ""
+        },
+        "lastReviewNode": {
+          "const": ""
+        },
+        "forcedReason": {
+          "const": ""
+        }
+      }
+    },
+    "capture-baseline": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "baseline",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--output",
+        "artifacts/baseline.json"
+      ],
+      "runWrites": [
+        "artifacts/baseline.json"
+      ]
+    },
+    "implement-r0-u0": {
+      "type": "agent",
+      "prompt": "You are the implementation node in a bounded, machine-reviewed workflow round.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nCURRENT REVISION INDEX\n{{reviseCount}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nLATEST CONSOLIDATED REVIEW FEEDBACK\n{{reviewFeedback}}\n\nPRIOR IMPLEMENTATION REPORT\n{{report}}\n\nWork directly in the project workspace. Address the root causes in the latest review feedback\nbefore making unrelated changes. Preserve the pinned acceptance contract and protected control\nplane. Run the relevant mechanical checks before returning. Do not claim success from inspection\nalone, weaken a check, special-case runtime data, or emit a workflow verdict. Judge the task's\ncriteria independently; a successful focused check is evidence, not terminal authority.\n\nReturn a concise report that names files changed, checks run, outcomes, and any remaining risk.\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "capture-evidence-r0-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-evidence-r0-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-evidence-r0-u0.json"
+      ]
+    },
+    "reward-hack-review-r0-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "cross-review-r0-u0": {
+      "type": "decision",
+      "prompt": "Adversarially review the implementation in this workspace. Stay read-only.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nRead the diff and touched files yourself. Check that the task criteria are actually met, verification\nclaims correspond to real commands, the implementation is correct for all valid inputs under the\nfixed specification, protected review/proof controls were not weakened or avoided, and changes remain in scope.\n\nREVISE only for a concrete, nameable defect tied to a file or behavior. Do not manufacture a\nfinding merely to appear strict. PASS only when you would accept responsibility for the change as\nimplemented.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "milestone-review-r0-u0": {
+      "type": "decision",
+      "prompt": "Run an independent first-principles milestone review. Stay read-only and evaluate the work itself,\nnot only its execution.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nReconstruct the task, constraints, and criteria from first principles. Treat the focused check as\nevidence rather than terminal authority. Determine whether\neach substantive change advances that goal, whether a convention was mistaken for a constraint,\nand whether unnecessary machinery creates correctness or maintenance risk. A simpler alternative\nis a REVISE finding only when the current construction has a concrete defect, unsupported burden,\nor scope violation. Do not reject sound work for not being theoretically minimal.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "advance-revision-r0-u0-implementation": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1
+    },
+    "record-reward-hack-review-r0-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "reward-hack-review-r0-u0"
+      }
+    },
+    "record-cross-review-r0-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "cross-review-r0-u0"
+      }
+    },
+    "record-milestone-review-r0-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "milestone-review-r0-u0"
+      }
+    },
+    "self-evolve-a-r0-u0": {
+      "type": "agent",
+      "prompt": "Perform the bounded post-round self-evolution step using the loaded `self-improve` and `memory`\ncontracts. Work from first-hand evidence rather than builder narration.\n\nTASK CONTEXT\n{{task}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nInspect the current run's built-in subagent evidence under `workflow-output/subagent/standard-round/`,\nincluding event and native-call journals, response receipts, mechanical evidence, and the actual\nworkspace diff. Also inspect relevant project reports, evaluation traces, source-layer memory, and\nexisting opt-in lemmas. Do not use another harness's runtime state, and do not infer prior\nactivations from provider prose.\n\nChoose exactly one outcome allowed by `self-improve`: `NONE`, `REPAIR`, or one lemma status. Most\nrounds should choose `NONE`. Do not change generalized behavior without the evidence level required\nby the loaded skill. Deduplicate before writing and create or update at most one reusable artifact.\n\nSet `/evolveNotes` to one short statement of what changed and why, or literal `NONE`. Set\n`/lemmaReport` to a JSON string that satisfies the chosen `self-improve` outcome contract. A\nminimal `NONE` report is:\n\n{\"outcome\":\"NONE\",\"behaviorChanged\":false,\"artifacts\":[],\"reason\":\"why no durable behavior change is warranted\"}\n\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "validate-lemmas-a-r0-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--validator",
+        "{{controller.projectRoot}}/.claude/skills/self-improve/scripts/validate_lemmas.py",
+        "--validator-sha256",
+        "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--lemma-report",
+        "{{lemmaReport}}"
+      ],
+      "runWrites": []
+    },
+    "evolve-review-a-r0-u0": {
+      "type": "decision",
+      "prompt": "Review the self-evolution edits made in this round. Stay read-only and treat the model report as an\nuntrusted claim.\n\nSELF-EVOLUTION NOTES\n{{evolveNotes}}\n\nLEMMA REPORT\n{{lemmaReport}}\n\nDETERMINISTIC LEMMA VALIDATION\n{{lemmaValidation}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nRead the actual diff and cited run artifacts. Require deterministic validation with `ok: true`.\nCheck that evidence comes from this round; lemma predictions precede interventions; probes\ndistinguish plausible alternatives; stochastic claims use multiple runs with noise handling;\nscope and falsifiers prevent unsupported generalization; and refuted or superseded evidence is\nretained. `NONE` must not change durable behavior. `REPAIR` must reproduce a direct defect and cite\ndiscriminating failing and passing probes. Only a supported lemma may introduce generalized new\nbehavior. Reject weakened gates, review rules, protected paths, acceptance, metrics, or evidence.\n\nAPPROVE is valid when no durable change was warranted and the run left only allowed memory residue.\nREVISE with one consolidated list of exact fixes otherwise.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "capture-final-evidence-a-r0-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-final-evidence-a-r0-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-final-evidence-a-r0-u0.json"
+      ]
+    },
+    "final-reward-hack-review-a-r0-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "record-final-reward-hack-review-a-r0-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "final-reward-hack-review-a-r0-u0"
+      }
+    },
+    "advance-revision-r0-u0-final-a": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1
+    },
+    "record-evolve-review-a-r0-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "evolve-review-a-r0-u0"
+      }
+    },
+    "consume-evolution-retry-r0-u0": {
+      "type": "increment",
+      "field": "evolveCount",
+      "by": 1,
+      "set": {
+        "evolutionRetryUsed": true
+      }
+    },
+    "self-evolve-b-r0-u0": {
+      "type": "agent",
+      "prompt": "Perform the bounded post-round self-evolution step using the loaded `self-improve` and `memory`\ncontracts. Work from first-hand evidence rather than builder narration.\n\nTASK CONTEXT\n{{task}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nInspect the current run's built-in subagent evidence under `workflow-output/subagent/standard-round/`,\nincluding event and native-call journals, response receipts, mechanical evidence, and the actual\nworkspace diff. Also inspect relevant project reports, evaluation traces, source-layer memory, and\nexisting opt-in lemmas. Do not use another harness's runtime state, and do not infer prior\nactivations from provider prose.\n\nChoose exactly one outcome allowed by `self-improve`: `NONE`, `REPAIR`, or one lemma status. Most\nrounds should choose `NONE`. Do not change generalized behavior without the evidence level required\nby the loaded skill. Deduplicate before writing and create or update at most one reusable artifact.\n\nSet `/evolveNotes` to one short statement of what changed and why, or literal `NONE`. Set\n`/lemmaReport` to a JSON string that satisfies the chosen `self-improve` outcome contract. A\nminimal `NONE` report is:\n\n{\"outcome\":\"NONE\",\"behaviorChanged\":false,\"artifacts\":[],\"reason\":\"why no durable behavior change is warranted\"}\n\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "validate-lemmas-b-r0-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--validator",
+        "{{controller.projectRoot}}/.claude/skills/self-improve/scripts/validate_lemmas.py",
+        "--validator-sha256",
+        "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--lemma-report",
+        "{{lemmaReport}}"
+      ],
+      "runWrites": []
+    },
+    "evolve-review-b-r0-u0": {
+      "type": "decision",
+      "prompt": "Review the self-evolution edits made in this round. Stay read-only and treat the model report as an\nuntrusted claim.\n\nSELF-EVOLUTION NOTES\n{{evolveNotes}}\n\nLEMMA REPORT\n{{lemmaReport}}\n\nDETERMINISTIC LEMMA VALIDATION\n{{lemmaValidation}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nRead the actual diff and cited run artifacts. Require deterministic validation with `ok: true`.\nCheck that evidence comes from this round; lemma predictions precede interventions; probes\ndistinguish plausible alternatives; stochastic claims use multiple runs with noise handling;\nscope and falsifiers prevent unsupported generalization; and refuted or superseded evidence is\nretained. `NONE` must not change durable behavior. `REPAIR` must reproduce a direct defect and cite\ndiscriminating failing and passing probes. Only a supported lemma may introduce generalized new\nbehavior. Reject weakened gates, review rules, protected paths, acceptance, metrics, or evidence.\n\nAPPROVE is valid when no durable change was warranted and the run left only allowed memory residue.\nREVISE with one consolidated list of exact fixes otherwise.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "capture-final-evidence-b-r0-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-final-evidence-b-r0-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-final-evidence-b-r0-u0.json"
+      ]
+    },
+    "final-reward-hack-review-b-r0-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "record-evolve-review-b-r0-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "evolve-review-b-r0-u0"
+      }
+    },
+    "exhaust-evolution-r0-u0-b": {
+      "type": "increment",
+      "field": "evolveCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "EVOLUTION_CAP_REACHED:exhaust-evolution-r0-u0-b"
+      }
+    },
+    "record-final-reward-hack-review-b-r0-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "final-reward-hack-review-b-r0-u0"
+      }
+    },
+    "advance-revision-r0-u0-final-b": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1
+    },
+    "implement-r1-u0": {
+      "type": "agent",
+      "prompt": "You are the implementation node in a bounded, machine-reviewed workflow round.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nCURRENT REVISION INDEX\n{{reviseCount}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nLATEST CONSOLIDATED REVIEW FEEDBACK\n{{reviewFeedback}}\n\nPRIOR IMPLEMENTATION REPORT\n{{report}}\n\nWork directly in the project workspace. Address the root causes in the latest review feedback\nbefore making unrelated changes. Preserve the pinned acceptance contract and protected control\nplane. Run the relevant mechanical checks before returning. Do not claim success from inspection\nalone, weaken a check, special-case runtime data, or emit a workflow verdict. Judge the task's\ncriteria independently; a successful focused check is evidence, not terminal authority.\n\nReturn a concise report that names files changed, checks run, outcomes, and any remaining risk.\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "capture-evidence-r1-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-evidence-r1-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-evidence-r1-u0.json"
+      ]
+    },
+    "reward-hack-review-r1-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "cross-review-r1-u0": {
+      "type": "decision",
+      "prompt": "Adversarially review the implementation in this workspace. Stay read-only.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nRead the diff and touched files yourself. Check that the task criteria are actually met, verification\nclaims correspond to real commands, the implementation is correct for all valid inputs under the\nfixed specification, protected review/proof controls were not weakened or avoided, and changes remain in scope.\n\nREVISE only for a concrete, nameable defect tied to a file or behavior. Do not manufacture a\nfinding merely to appear strict. PASS only when you would accept responsibility for the change as\nimplemented.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "milestone-review-r1-u0": {
+      "type": "decision",
+      "prompt": "Run an independent first-principles milestone review. Stay read-only and evaluate the work itself,\nnot only its execution.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nReconstruct the task, constraints, and criteria from first principles. Treat the focused check as\nevidence rather than terminal authority. Determine whether\neach substantive change advances that goal, whether a convention was mistaken for a constraint,\nand whether unnecessary machinery creates correctness or maintenance risk. A simpler alternative\nis a REVISE finding only when the current construction has a concrete defect, unsupported burden,\nor scope violation. Do not reject sound work for not being theoretically minimal.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "advance-revision-r1-u0-implementation": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1
+    },
+    "record-reward-hack-review-r1-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "reward-hack-review-r1-u0"
+      }
+    },
+    "record-cross-review-r1-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "cross-review-r1-u0"
+      }
+    },
+    "record-milestone-review-r1-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "milestone-review-r1-u0"
+      }
+    },
+    "self-evolve-a-r1-u0": {
+      "type": "agent",
+      "prompt": "Perform the bounded post-round self-evolution step using the loaded `self-improve` and `memory`\ncontracts. Work from first-hand evidence rather than builder narration.\n\nTASK CONTEXT\n{{task}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nInspect the current run's built-in subagent evidence under `workflow-output/subagent/standard-round/`,\nincluding event and native-call journals, response receipts, mechanical evidence, and the actual\nworkspace diff. Also inspect relevant project reports, evaluation traces, source-layer memory, and\nexisting opt-in lemmas. Do not use another harness's runtime state, and do not infer prior\nactivations from provider prose.\n\nChoose exactly one outcome allowed by `self-improve`: `NONE`, `REPAIR`, or one lemma status. Most\nrounds should choose `NONE`. Do not change generalized behavior without the evidence level required\nby the loaded skill. Deduplicate before writing and create or update at most one reusable artifact.\n\nSet `/evolveNotes` to one short statement of what changed and why, or literal `NONE`. Set\n`/lemmaReport` to a JSON string that satisfies the chosen `self-improve` outcome contract. A\nminimal `NONE` report is:\n\n{\"outcome\":\"NONE\",\"behaviorChanged\":false,\"artifacts\":[],\"reason\":\"why no durable behavior change is warranted\"}\n\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "validate-lemmas-a-r1-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--validator",
+        "{{controller.projectRoot}}/.claude/skills/self-improve/scripts/validate_lemmas.py",
+        "--validator-sha256",
+        "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--lemma-report",
+        "{{lemmaReport}}"
+      ],
+      "runWrites": []
+    },
+    "evolve-review-a-r1-u0": {
+      "type": "decision",
+      "prompt": "Review the self-evolution edits made in this round. Stay read-only and treat the model report as an\nuntrusted claim.\n\nSELF-EVOLUTION NOTES\n{{evolveNotes}}\n\nLEMMA REPORT\n{{lemmaReport}}\n\nDETERMINISTIC LEMMA VALIDATION\n{{lemmaValidation}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nRead the actual diff and cited run artifacts. Require deterministic validation with `ok: true`.\nCheck that evidence comes from this round; lemma predictions precede interventions; probes\ndistinguish plausible alternatives; stochastic claims use multiple runs with noise handling;\nscope and falsifiers prevent unsupported generalization; and refuted or superseded evidence is\nretained. `NONE` must not change durable behavior. `REPAIR` must reproduce a direct defect and cite\ndiscriminating failing and passing probes. Only a supported lemma may introduce generalized new\nbehavior. Reject weakened gates, review rules, protected paths, acceptance, metrics, or evidence.\n\nAPPROVE is valid when no durable change was warranted and the run left only allowed memory residue.\nREVISE with one consolidated list of exact fixes otherwise.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "capture-final-evidence-a-r1-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-final-evidence-a-r1-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-final-evidence-a-r1-u0.json"
+      ]
+    },
+    "final-reward-hack-review-a-r1-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "record-final-reward-hack-review-a-r1-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "final-reward-hack-review-a-r1-u0"
+      }
+    },
+    "advance-revision-r1-u0-final-a": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1
+    },
+    "record-evolve-review-a-r1-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "evolve-review-a-r1-u0"
+      }
+    },
+    "consume-evolution-retry-r1-u0": {
+      "type": "increment",
+      "field": "evolveCount",
+      "by": 1,
+      "set": {
+        "evolutionRetryUsed": true
+      }
+    },
+    "self-evolve-b-r1-u0": {
+      "type": "agent",
+      "prompt": "Perform the bounded post-round self-evolution step using the loaded `self-improve` and `memory`\ncontracts. Work from first-hand evidence rather than builder narration.\n\nTASK CONTEXT\n{{task}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nInspect the current run's built-in subagent evidence under `workflow-output/subagent/standard-round/`,\nincluding event and native-call journals, response receipts, mechanical evidence, and the actual\nworkspace diff. Also inspect relevant project reports, evaluation traces, source-layer memory, and\nexisting opt-in lemmas. Do not use another harness's runtime state, and do not infer prior\nactivations from provider prose.\n\nChoose exactly one outcome allowed by `self-improve`: `NONE`, `REPAIR`, or one lemma status. Most\nrounds should choose `NONE`. Do not change generalized behavior without the evidence level required\nby the loaded skill. Deduplicate before writing and create or update at most one reusable artifact.\n\nSet `/evolveNotes` to one short statement of what changed and why, or literal `NONE`. Set\n`/lemmaReport` to a JSON string that satisfies the chosen `self-improve` outcome contract. A\nminimal `NONE` report is:\n\n{\"outcome\":\"NONE\",\"behaviorChanged\":false,\"artifacts\":[],\"reason\":\"why no durable behavior change is warranted\"}\n\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "validate-lemmas-b-r1-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--validator",
+        "{{controller.projectRoot}}/.claude/skills/self-improve/scripts/validate_lemmas.py",
+        "--validator-sha256",
+        "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--lemma-report",
+        "{{lemmaReport}}"
+      ],
+      "runWrites": []
+    },
+    "evolve-review-b-r1-u0": {
+      "type": "decision",
+      "prompt": "Review the self-evolution edits made in this round. Stay read-only and treat the model report as an\nuntrusted claim.\n\nSELF-EVOLUTION NOTES\n{{evolveNotes}}\n\nLEMMA REPORT\n{{lemmaReport}}\n\nDETERMINISTIC LEMMA VALIDATION\n{{lemmaValidation}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nRead the actual diff and cited run artifacts. Require deterministic validation with `ok: true`.\nCheck that evidence comes from this round; lemma predictions precede interventions; probes\ndistinguish plausible alternatives; stochastic claims use multiple runs with noise handling;\nscope and falsifiers prevent unsupported generalization; and refuted or superseded evidence is\nretained. `NONE` must not change durable behavior. `REPAIR` must reproduce a direct defect and cite\ndiscriminating failing and passing probes. Only a supported lemma may introduce generalized new\nbehavior. Reject weakened gates, review rules, protected paths, acceptance, metrics, or evidence.\n\nAPPROVE is valid when no durable change was warranted and the run left only allowed memory residue.\nREVISE with one consolidated list of exact fixes otherwise.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "capture-final-evidence-b-r1-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-final-evidence-b-r1-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-final-evidence-b-r1-u0.json"
+      ]
+    },
+    "final-reward-hack-review-b-r1-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "record-evolve-review-b-r1-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "evolve-review-b-r1-u0"
+      }
+    },
+    "exhaust-evolution-r1-u0-b": {
+      "type": "increment",
+      "field": "evolveCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "EVOLUTION_CAP_REACHED:exhaust-evolution-r1-u0-b"
+      }
+    },
+    "record-final-reward-hack-review-b-r1-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "final-reward-hack-review-b-r1-u0"
+      }
+    },
+    "advance-revision-r1-u0-final-b": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1
+    },
+    "implement-r2-u0": {
+      "type": "agent",
+      "prompt": "You are the implementation node in a bounded, machine-reviewed workflow round.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nCURRENT REVISION INDEX\n{{reviseCount}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nLATEST CONSOLIDATED REVIEW FEEDBACK\n{{reviewFeedback}}\n\nPRIOR IMPLEMENTATION REPORT\n{{report}}\n\nWork directly in the project workspace. Address the root causes in the latest review feedback\nbefore making unrelated changes. Preserve the pinned acceptance contract and protected control\nplane. Run the relevant mechanical checks before returning. Do not claim success from inspection\nalone, weaken a check, special-case runtime data, or emit a workflow verdict. Judge the task's\ncriteria independently; a successful focused check is evidence, not terminal authority.\n\nReturn a concise report that names files changed, checks run, outcomes, and any remaining risk.\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "capture-evidence-r2-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-evidence-r2-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-evidence-r2-u0.json"
+      ]
+    },
+    "reward-hack-review-r2-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "cross-review-r2-u0": {
+      "type": "decision",
+      "prompt": "Adversarially review the implementation in this workspace. Stay read-only.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nRead the diff and touched files yourself. Check that the task criteria are actually met, verification\nclaims correspond to real commands, the implementation is correct for all valid inputs under the\nfixed specification, protected review/proof controls were not weakened or avoided, and changes remain in scope.\n\nREVISE only for a concrete, nameable defect tied to a file or behavior. Do not manufacture a\nfinding merely to appear strict. PASS only when you would accept responsibility for the change as\nimplemented.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "milestone-review-r2-u0": {
+      "type": "decision",
+      "prompt": "Run an independent first-principles milestone review. Stay read-only and evaluate the work itself,\nnot only its execution.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nReconstruct the task, constraints, and criteria from first principles. Treat the focused check as\nevidence rather than terminal authority. Determine whether\neach substantive change advances that goal, whether a convention was mistaken for a constraint,\nand whether unnecessary machinery creates correctness or maintenance risk. A simpler alternative\nis a REVISE finding only when the current construction has a concrete defect, unsupported burden,\nor scope violation. Do not reject sound work for not being theoretically minimal.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "exhaust-revision-r2-u0-implementation": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "REVISION_CAP_REACHED:exhaust-revision-r2-u0-implementation"
+      }
+    },
+    "record-reward-hack-review-r2-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "reward-hack-review-r2-u0"
+      }
+    },
+    "record-cross-review-r2-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "cross-review-r2-u0"
+      }
+    },
+    "record-milestone-review-r2-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "milestone-review-r2-u0"
+      }
+    },
+    "self-evolve-a-r2-u0": {
+      "type": "agent",
+      "prompt": "Perform the bounded post-round self-evolution step using the loaded `self-improve` and `memory`\ncontracts. Work from first-hand evidence rather than builder narration.\n\nTASK CONTEXT\n{{task}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nInspect the current run's built-in subagent evidence under `workflow-output/subagent/standard-round/`,\nincluding event and native-call journals, response receipts, mechanical evidence, and the actual\nworkspace diff. Also inspect relevant project reports, evaluation traces, source-layer memory, and\nexisting opt-in lemmas. Do not use another harness's runtime state, and do not infer prior\nactivations from provider prose.\n\nChoose exactly one outcome allowed by `self-improve`: `NONE`, `REPAIR`, or one lemma status. Most\nrounds should choose `NONE`. Do not change generalized behavior without the evidence level required\nby the loaded skill. Deduplicate before writing and create or update at most one reusable artifact.\n\nSet `/evolveNotes` to one short statement of what changed and why, or literal `NONE`. Set\n`/lemmaReport` to a JSON string that satisfies the chosen `self-improve` outcome contract. A\nminimal `NONE` report is:\n\n{\"outcome\":\"NONE\",\"behaviorChanged\":false,\"artifacts\":[],\"reason\":\"why no durable behavior change is warranted\"}\n\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "validate-lemmas-a-r2-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--validator",
+        "{{controller.projectRoot}}/.claude/skills/self-improve/scripts/validate_lemmas.py",
+        "--validator-sha256",
+        "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--lemma-report",
+        "{{lemmaReport}}"
+      ],
+      "runWrites": []
+    },
+    "evolve-review-a-r2-u0": {
+      "type": "decision",
+      "prompt": "Review the self-evolution edits made in this round. Stay read-only and treat the model report as an\nuntrusted claim.\n\nSELF-EVOLUTION NOTES\n{{evolveNotes}}\n\nLEMMA REPORT\n{{lemmaReport}}\n\nDETERMINISTIC LEMMA VALIDATION\n{{lemmaValidation}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nRead the actual diff and cited run artifacts. Require deterministic validation with `ok: true`.\nCheck that evidence comes from this round; lemma predictions precede interventions; probes\ndistinguish plausible alternatives; stochastic claims use multiple runs with noise handling;\nscope and falsifiers prevent unsupported generalization; and refuted or superseded evidence is\nretained. `NONE` must not change durable behavior. `REPAIR` must reproduce a direct defect and cite\ndiscriminating failing and passing probes. Only a supported lemma may introduce generalized new\nbehavior. Reject weakened gates, review rules, protected paths, acceptance, metrics, or evidence.\n\nAPPROVE is valid when no durable change was warranted and the run left only allowed memory residue.\nREVISE with one consolidated list of exact fixes otherwise.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "capture-final-evidence-a-r2-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-final-evidence-a-r2-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-final-evidence-a-r2-u0.json"
+      ]
+    },
+    "final-reward-hack-review-a-r2-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "record-final-reward-hack-review-a-r2-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "final-reward-hack-review-a-r2-u0"
+      }
+    },
+    "exhaust-revision-r2-u0-final-a": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "REVISION_CAP_REACHED:exhaust-revision-r2-u0-final-a"
+      }
+    },
+    "record-evolve-review-a-r2-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "evolve-review-a-r2-u0"
+      }
+    },
+    "consume-evolution-retry-r2-u0": {
+      "type": "increment",
+      "field": "evolveCount",
+      "by": 1,
+      "set": {
+        "evolutionRetryUsed": true
+      }
+    },
+    "self-evolve-b-r2-u0": {
+      "type": "agent",
+      "prompt": "Perform the bounded post-round self-evolution step using the loaded `self-improve` and `memory`\ncontracts. Work from first-hand evidence rather than builder narration.\n\nTASK CONTEXT\n{{task}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nInspect the current run's built-in subagent evidence under `workflow-output/subagent/standard-round/`,\nincluding event and native-call journals, response receipts, mechanical evidence, and the actual\nworkspace diff. Also inspect relevant project reports, evaluation traces, source-layer memory, and\nexisting opt-in lemmas. Do not use another harness's runtime state, and do not infer prior\nactivations from provider prose.\n\nChoose exactly one outcome allowed by `self-improve`: `NONE`, `REPAIR`, or one lemma status. Most\nrounds should choose `NONE`. Do not change generalized behavior without the evidence level required\nby the loaded skill. Deduplicate before writing and create or update at most one reusable artifact.\n\nSet `/evolveNotes` to one short statement of what changed and why, or literal `NONE`. Set\n`/lemmaReport` to a JSON string that satisfies the chosen `self-improve` outcome contract. A\nminimal `NONE` report is:\n\n{\"outcome\":\"NONE\",\"behaviorChanged\":false,\"artifacts\":[],\"reason\":\"why no durable behavior change is warranted\"}\n\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "validate-lemmas-b-r2-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--validator",
+        "{{controller.projectRoot}}/.claude/skills/self-improve/scripts/validate_lemmas.py",
+        "--validator-sha256",
+        "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--lemma-report",
+        "{{lemmaReport}}"
+      ],
+      "runWrites": []
+    },
+    "evolve-review-b-r2-u0": {
+      "type": "decision",
+      "prompt": "Review the self-evolution edits made in this round. Stay read-only and treat the model report as an\nuntrusted claim.\n\nSELF-EVOLUTION NOTES\n{{evolveNotes}}\n\nLEMMA REPORT\n{{lemmaReport}}\n\nDETERMINISTIC LEMMA VALIDATION\n{{lemmaValidation}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nRead the actual diff and cited run artifacts. Require deterministic validation with `ok: true`.\nCheck that evidence comes from this round; lemma predictions precede interventions; probes\ndistinguish plausible alternatives; stochastic claims use multiple runs with noise handling;\nscope and falsifiers prevent unsupported generalization; and refuted or superseded evidence is\nretained. `NONE` must not change durable behavior. `REPAIR` must reproduce a direct defect and cite\ndiscriminating failing and passing probes. Only a supported lemma may introduce generalized new\nbehavior. Reject weakened gates, review rules, protected paths, acceptance, metrics, or evidence.\n\nAPPROVE is valid when no durable change was warranted and the run left only allowed memory residue.\nREVISE with one consolidated list of exact fixes otherwise.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "capture-final-evidence-b-r2-u0": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-final-evidence-b-r2-u0.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-final-evidence-b-r2-u0.json"
+      ]
+    },
+    "final-reward-hack-review-b-r2-u0": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "record-evolve-review-b-r2-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "evolve-review-b-r2-u0"
+      }
+    },
+    "exhaust-evolution-r2-u0-b": {
+      "type": "increment",
+      "field": "evolveCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "EVOLUTION_CAP_REACHED:exhaust-evolution-r2-u0-b"
+      }
+    },
+    "record-final-reward-hack-review-b-r2-u0": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "final-reward-hack-review-b-r2-u0"
+      }
+    },
+    "exhaust-revision-r2-u0-final-b": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "REVISION_CAP_REACHED:exhaust-revision-r2-u0-final-b"
+      }
+    },
+    "implement-r1-u1": {
+      "type": "agent",
+      "prompt": "You are the implementation node in a bounded, machine-reviewed workflow round.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nCURRENT REVISION INDEX\n{{reviseCount}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nLATEST CONSOLIDATED REVIEW FEEDBACK\n{{reviewFeedback}}\n\nPRIOR IMPLEMENTATION REPORT\n{{report}}\n\nWork directly in the project workspace. Address the root causes in the latest review feedback\nbefore making unrelated changes. Preserve the pinned acceptance contract and protected control\nplane. Run the relevant mechanical checks before returning. Do not claim success from inspection\nalone, weaken a check, special-case runtime data, or emit a workflow verdict. Judge the task's\ncriteria independently; a successful focused check is evidence, not terminal authority.\n\nReturn a concise report that names files changed, checks run, outcomes, and any remaining risk.\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "capture-evidence-r1-u1": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-evidence-r1-u1.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-evidence-r1-u1.json"
+      ]
+    },
+    "reward-hack-review-r1-u1": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "cross-review-r1-u1": {
+      "type": "decision",
+      "prompt": "Adversarially review the implementation in this workspace. Stay read-only.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nRead the diff and touched files yourself. Check that the task criteria are actually met, verification\nclaims correspond to real commands, the implementation is correct for all valid inputs under the\nfixed specification, protected review/proof controls were not weakened or avoided, and changes remain in scope.\n\nREVISE only for a concrete, nameable defect tied to a file or behavior. Do not manufacture a\nfinding merely to appear strict. PASS only when you would accept responsibility for the change as\nimplemented.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "milestone-review-r1-u1": {
+      "type": "decision",
+      "prompt": "Run an independent first-principles milestone review. Stay read-only and evaluate the work itself,\nnot only its execution.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nReconstruct the task, constraints, and criteria from first principles. Treat the focused check as\nevidence rather than terminal authority. Determine whether\neach substantive change advances that goal, whether a convention was mistaken for a constraint,\nand whether unnecessary machinery creates correctness or maintenance risk. A simpler alternative\nis a REVISE finding only when the current construction has a concrete defect, unsupported burden,\nor scope violation. Do not reject sound work for not being theoretically minimal.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "advance-revision-r1-u1-implementation": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1
+    },
+    "record-reward-hack-review-r1-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "reward-hack-review-r1-u1"
+      }
+    },
+    "record-cross-review-r1-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "cross-review-r1-u1"
+      }
+    },
+    "record-milestone-review-r1-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "milestone-review-r1-u1"
+      }
+    },
+    "self-evolve-a-r1-u1": {
+      "type": "agent",
+      "prompt": "Perform the bounded post-round self-evolution step using the loaded `self-improve` and `memory`\ncontracts. Work from first-hand evidence rather than builder narration.\n\nTASK CONTEXT\n{{task}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nInspect the current run's built-in subagent evidence under `workflow-output/subagent/standard-round/`,\nincluding event and native-call journals, response receipts, mechanical evidence, and the actual\nworkspace diff. Also inspect relevant project reports, evaluation traces, source-layer memory, and\nexisting opt-in lemmas. Do not use another harness's runtime state, and do not infer prior\nactivations from provider prose.\n\nChoose exactly one outcome allowed by `self-improve`: `NONE`, `REPAIR`, or one lemma status. Most\nrounds should choose `NONE`. Do not change generalized behavior without the evidence level required\nby the loaded skill. Deduplicate before writing and create or update at most one reusable artifact.\n\nSet `/evolveNotes` to one short statement of what changed and why, or literal `NONE`. Set\n`/lemmaReport` to a JSON string that satisfies the chosen `self-improve` outcome contract. A\nminimal `NONE` report is:\n\n{\"outcome\":\"NONE\",\"behaviorChanged\":false,\"artifacts\":[],\"reason\":\"why no durable behavior change is warranted\"}\n\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "validate-lemmas-a-r1-u1": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--validator",
+        "{{controller.projectRoot}}/.claude/skills/self-improve/scripts/validate_lemmas.py",
+        "--validator-sha256",
+        "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--lemma-report",
+        "{{lemmaReport}}"
+      ],
+      "runWrites": []
+    },
+    "evolve-review-a-r1-u1": {
+      "type": "decision",
+      "prompt": "Review the self-evolution edits made in this round. Stay read-only and treat the model report as an\nuntrusted claim.\n\nSELF-EVOLUTION NOTES\n{{evolveNotes}}\n\nLEMMA REPORT\n{{lemmaReport}}\n\nDETERMINISTIC LEMMA VALIDATION\n{{lemmaValidation}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nRead the actual diff and cited run artifacts. Require deterministic validation with `ok: true`.\nCheck that evidence comes from this round; lemma predictions precede interventions; probes\ndistinguish plausible alternatives; stochastic claims use multiple runs with noise handling;\nscope and falsifiers prevent unsupported generalization; and refuted or superseded evidence is\nretained. `NONE` must not change durable behavior. `REPAIR` must reproduce a direct defect and cite\ndiscriminating failing and passing probes. Only a supported lemma may introduce generalized new\nbehavior. Reject weakened gates, review rules, protected paths, acceptance, metrics, or evidence.\n\nAPPROVE is valid when no durable change was warranted and the run left only allowed memory residue.\nREVISE with one consolidated list of exact fixes otherwise.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "capture-final-evidence-a-r1-u1": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-final-evidence-a-r1-u1.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-final-evidence-a-r1-u1.json"
+      ]
+    },
+    "final-reward-hack-review-a-r1-u1": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "record-final-reward-hack-review-a-r1-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "final-reward-hack-review-a-r1-u1"
+      }
+    },
+    "advance-revision-r1-u1-final-a": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1
+    },
+    "record-evolve-review-a-r1-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "evolve-review-a-r1-u1"
+      }
+    },
+    "exhaust-evolution-r1-u1-a": {
+      "type": "increment",
+      "field": "evolveCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "EVOLUTION_CAP_REACHED:exhaust-evolution-r1-u1-a"
+      }
+    },
+    "implement-r2-u1": {
+      "type": "agent",
+      "prompt": "You are the implementation node in a bounded, machine-reviewed workflow round.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nCURRENT REVISION INDEX\n{{reviseCount}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nLATEST CONSOLIDATED REVIEW FEEDBACK\n{{reviewFeedback}}\n\nPRIOR IMPLEMENTATION REPORT\n{{report}}\n\nWork directly in the project workspace. Address the root causes in the latest review feedback\nbefore making unrelated changes. Preserve the pinned acceptance contract and protected control\nplane. Run the relevant mechanical checks before returning. Do not claim success from inspection\nalone, weaken a check, special-case runtime data, or emit a workflow verdict. Judge the task's\ncriteria independently; a successful focused check is evidence, not terminal authority.\n\nReturn a concise report that names files changed, checks run, outcomes, and any remaining risk.\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "capture-evidence-r2-u1": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-evidence-r2-u1.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-evidence-r2-u1.json"
+      ]
+    },
+    "reward-hack-review-r2-u1": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "cross-review-r2-u1": {
+      "type": "decision",
+      "prompt": "Adversarially review the implementation in this workspace. Stay read-only.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nRead the diff and touched files yourself. Check that the task criteria are actually met, verification\nclaims correspond to real commands, the implementation is correct for all valid inputs under the\nfixed specification, protected review/proof controls were not weakened or avoided, and changes remain in scope.\n\nREVISE only for a concrete, nameable defect tied to a file or behavior. Do not manufacture a\nfinding merely to appear strict. PASS only when you would accept responsibility for the change as\nimplemented.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "milestone-review-r2-u1": {
+      "type": "decision",
+      "prompt": "Run an independent first-principles milestone review. Stay read-only and evaluate the work itself,\nnot only its execution.\n\nTASK\n{{task}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nBUILDER REPORT\n{{report}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nReconstruct the task, constraints, and criteria from first principles. Treat the focused check as\nevidence rather than terminal authority. Determine whether\neach substantive change advances that goal, whether a convention was mistaken for a constraint,\nand whether unnecessary machinery creates correctness or maintenance risk. A simpler alternative\nis a REVISE finding only when the current construction has a concrete defect, unsupported burden,\nor scope violation. Do not reject sound work for not being theoretically minimal.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "exhaust-revision-r2-u1-implementation": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "REVISION_CAP_REACHED:exhaust-revision-r2-u1-implementation"
+      }
+    },
+    "record-reward-hack-review-r2-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "reward-hack-review-r2-u1"
+      }
+    },
+    "record-cross-review-r2-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "cross-review-r2-u1"
+      }
+    },
+    "record-milestone-review-r2-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "milestone-review-r2-u1"
+      }
+    },
+    "self-evolve-a-r2-u1": {
+      "type": "agent",
+      "prompt": "Perform the bounded post-round self-evolution step using the loaded `self-improve` and `memory`\ncontracts. Work from first-hand evidence rather than builder narration.\n\nTASK CONTEXT\n{{task}}\n\nLATEST REVIEW FEEDBACK\n{{reviewFeedback}}\n\nLAST REVIEW NODE\n{{lastReviewNode}}\n\nCURRENT EVOLUTION INDEX\n{{evolveCount}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nInspect the current run's built-in subagent evidence under `workflow-output/subagent/standard-round/`,\nincluding event and native-call journals, response receipts, mechanical evidence, and the actual\nworkspace diff. Also inspect relevant project reports, evaluation traces, source-layer memory, and\nexisting opt-in lemmas. Do not use another harness's runtime state, and do not infer prior\nactivations from provider prose.\n\nChoose exactly one outcome allowed by `self-improve`: `NONE`, `REPAIR`, or one lemma status. Most\nrounds should choose `NONE`. Do not change generalized behavior without the evidence level required\nby the loaded skill. Deduplicate before writing and create or update at most one reusable artifact.\n\nSet `/evolveNotes` to one short statement of what changed and why, or literal `NONE`. Set\n`/lemmaReport` to a JSON string that satisfies the chosen `self-improve` outcome contract. A\nminimal `NONE` report is:\n\n{\"outcome\":\"NONE\",\"behaviorChanged\":false,\"artifacts\":[],\"reason\":\"why no durable behavior change is warranted\"}\n\nThe controller appends the exact WorkflowActivationOutput state-patch contract; follow it exactly.\n"
+    },
+    "validate-lemmas-a-r2-u1": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/validate_lemmas.ts",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--validator",
+        "{{controller.projectRoot}}/.claude/skills/self-improve/scripts/validate_lemmas.py",
+        "--validator-sha256",
+        "65415fbfbbf5696b02301ad1b7cc709b7457089793aebf2d654606e61156afef",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--lemma-report",
+        "{{lemmaReport}}"
+      ],
+      "runWrites": []
+    },
+    "evolve-review-a-r2-u1": {
+      "type": "decision",
+      "prompt": "Review the self-evolution edits made in this round. Stay read-only and treat the model report as an\nuntrusted claim.\n\nSELF-EVOLUTION NOTES\n{{evolveNotes}}\n\nLEMMA REPORT\n{{lemmaReport}}\n\nDETERMINISTIC LEMMA VALIDATION\n{{lemmaValidation}}\n\nEVOLUTION RETRY ALREADY USED\n{{evolutionRetryUsed}}\n\nRead the actual diff and cited run artifacts. Require deterministic validation with `ok: true`.\nCheck that evidence comes from this round; lemma predictions precede interventions; probes\ndistinguish plausible alternatives; stochastic claims use multiple runs with noise handling;\nscope and falsifiers prevent unsupported generalization; and refuted or superseded evidence is\nretained. `NONE` must not change durable behavior. `REPAIR` must reproduce a direct defect and cite\ndiscriminating failing and passing probes. Only a supported lemma may introduce generalized new\nbehavior. Reject weakened gates, review rules, protected paths, acceptance, metrics, or evidence.\n\nAPPROVE is valid when no durable change was warranted and the run left only allowed memory residue.\nREVISE with one consolidated list of exact fixes otherwise.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `APPROVE` or `REVISE`. Do not emit a state patch and do not modify files.\n"
+    },
+    "capture-final-evidence-a-r2-u1": {
+      "type": "command",
+      "argv": [
+        "{{executable.controller-runtime.path}}",
+        ".claude/skills/subagent-workflow/scripts/controller/actions/reward_evidence.ts",
+        "evidence",
+        "--project-root",
+        "{{controller.projectRoot}}",
+        "--run-root",
+        "{{controller.runRoot}}",
+        "--helper",
+        "{{controller.projectRoot}}/.claude/skills/subagent-workflow/scripts/native/reward_hacking_evidence.py",
+        "--helper-sha256",
+        "d43cbe5e012fd484e685b052ed0bd9f9383018f4abba4f5ac6e940bb04d5d33a",
+        "--python",
+        "{{executable.python.path}}",
+        "--python-sha256",
+        "{{executable.python.sha256}}",
+        "--git",
+        "{{executable.git.path}}",
+        "--git-sha256",
+        "{{executable.git.sha256}}",
+        "--baseline",
+        "{{baselinePath}}",
+        "--expected-baseline-digest",
+        "{{baselineDigest}}",
+        "--acceptance-argv-json",
+        "{{acceptanceArgv}}",
+        "--acceptance-timeout",
+        "17400",
+        "--output",
+        "artifacts/capture-final-evidence-a-r2-u1.json"
+      ],
+      "runWrites": [
+        "artifacts/capture-final-evidence-a-r2-u1.json"
+      ]
+    },
+    "final-reward-hack-review-a-r2-u1": {
+      "type": "decision",
+      "prompt": "Independently review whether the current workspace bytes solve the task rather than game its\nmeasurement. Stay read-only.\n\nTASK\n{{task}}\n\nTASK-SPECIFIC REWARD-HACKING RISK HYPOTHESES (scheduler/main supplied; untrusted, verify each)\n{{rewardHackingRisks}}\n\nFOCUSED CHECK ARGV (JSON; executed without a shell)\n{{acceptanceArgv}}\n\nPRE-IMPLEMENTATION BASELINE PATH\n{{baselinePath}}\n\nPRE-IMPLEMENTATION BASELINE SUMMARY\n{{baselineSummary}}\n\nPRE-IMPLEMENTATION BASELINE DIGEST\n{{baselineDigest}}\n\nMECHANICAL BYTE EVIDENCE\n{{evidence}}\n\nMECHANICAL EVIDENCE PATH\n{{evidencePath}}\n\nMECHANICAL EVIDENCE DIGEST\n{{evidenceDigest}}\n\nWORKSPACE STATE BINDING\n{{stateBinding}}\n\nCONTROLLER REVIEW COMMITMENT\n{{review.commitment}}\n\nRead the cited baseline and evidence plus the repository bytes yourself. For every supplied risk hypothesis, inspect the actual diff and evidence and state whether it is supported or disconfirmed; an empty list is not evidence that no reward hacking is possible. Verify that the evidence\nbinds the repository identity, tracked and non-ignored untracked bytes, binary/deletion/rename/\nmode/symlink changes, and a successful focused-check result. Treat ignored paths, caches,\nGit metadata, and declared exclusions as uncovered. If the task depends on an excluded path,\nreturn REVISE and name the gap.\n\nPASS only when there is no concrete mechanism by which the patch can pass without satisfying the\ntask and its criteria. The focused check is evidence, not terminal authority. REVISE for\nruntime-data hardcoding, expected-output hardcoding, test detection,\nweakened or bypassed evaluation, proxy gaming, hidden relevant bytes, stale/malformed evidence,\nor another specific unsupported claim. Fixed-spec constants and static scheduling are allowed\nwhen they remain correct for every valid input under the stated contract.\n\nReturn exactly one JSON object as the final non-empty line with keys `verdict` and `summary`.\n`verdict` must be `PASS` or `REVISE`. Batch every actionable finding into `summary`. Do not emit\na state patch and do not modify files.\n"
+    },
+    "record-final-reward-hack-review-a-r2-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "final-reward-hack-review-a-r2-u1"
+      }
+    },
+    "exhaust-revision-r2-u1-final-a": {
+      "type": "increment",
+      "field": "reviseCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "REVISION_CAP_REACHED:exhaust-revision-r2-u1-final-a"
+      }
+    },
+    "record-evolve-review-a-r2-u1": {
+      "type": "template",
+      "values": {
+        "lastReviewNode": "evolve-review-a-r2-u1"
+      }
+    },
+    "exhaust-evolution-r2-u1-a": {
+      "type": "increment",
+      "field": "evolveCount",
+      "by": 1,
+      "set": {
+        "forcedReason": "EVOLUTION_CAP_REACHED:exhaust-evolution-r2-u1-a"
+      }
+    },
+    "archive-proof": {
+      "type": "template",
+      "values": {
+        "proofCandidatePath": "state-bound-candidate.json"
+      }
+    },
+    "success": {
+      "type": "terminal"
+    },
+    "unresolved": {
+      "type": "terminal"
+    }
+  }
+}

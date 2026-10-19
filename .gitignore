@@ -1,0 +1,24 @@
+.env
+__pycache__/
+*.pyc
+# Per-run workflow output — runtime, not shipped
+workflow-output/
+# iteration-time design/research docs — kept LOCAL, not shipped (not needed to run the agent)
+design/
+# per-session / runtime PM state — created at managed startup/launch, never shipped in the template or committed
+.pm/role
+.pm/.pause
+.pm/.allow_task
+.pm/.waiting
+.pm/awaiting_human
+.pm/cold_start_done
+.pm/ask/
+.pm/*.lock
+.pm/tasks/*/.writer.lock
+.pm/self_evolve/
+.pm/linear_inbox.md
+.pm/round_input.json
+.pm/grind_state.json
+.pm/.grind_state.json
+.pm/linear_close_pending.txt
+.memory/private/

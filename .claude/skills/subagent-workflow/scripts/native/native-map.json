@@ -1,0 +1,301 @@
+{
+  "providers": {
+    "anthropic": {
+      "bin": "claude",
+      "nativeProviderFamily": "anthropic",
+      "args": [
+        "--model",
+        "{model}",
+        "-p",
+        "{prompt}",
+        "--output-format",
+        "text",
+        "--dangerously-skip-permissions"
+      ],
+      "readArgs": [
+        "--model",
+        "{model}",
+        "-p",
+        "{prompt}",
+        "--output-format",
+        "text",
+        "--safe-mode",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        "Read,Glob,Grep"
+      ],
+      "schedulerArgs": [
+        "--model",
+        "{model}",
+        "-p",
+        "{prompt}",
+        "--output-format",
+        "text",
+        "--safe-mode",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        ""
+      ],
+      "session": {
+        "idSource": "assigned-uuid",
+        "start": { "position": "start", "args": ["--session-id", "{sessionId}"] },
+        "resume": { "position": "start", "args": ["--resume", "{sessionId}"] },
+        "output": "text",
+        "continuePrompt": "continue. Inspect the current workspace and session state first. Do not repeat completed side effects. Finish the original workflow-node assignment and return the required final JSON object.",
+        "heartbeatSeconds": 300,
+        "stallSeconds": 3600,
+        "backoffSeconds": [300, 600, 1800, 3600]
+      },
+      "effort": {
+        "values": ["low", "medium", "high", "xhigh", "max"],
+        "args": ["--effort", "{effort}"]
+      }
+    },
+    "openai-codex": {
+      "bin": "codex",
+      "nativeProviderFamily": "codex",
+      "args": [
+        "exec",
+        "-m",
+        "{model}",
+        "--dangerously-bypass-approvals-and-sandbox",
+        "{prompt}"
+      ],
+      "session": {
+        "idSource": "jsonl-event",
+        "start": { "position": "after", "anchor": "exec", "args": ["--json"] },
+        "resume": { "position": "after", "anchor": "exec", "args": ["resume", "{sessionId}", "--json"] },
+        "eventType": "thread.started",
+        "eventIdField": "thread_id",
+        "output": "jsonl-agent-message",
+        "continuePrompt": "continue. Inspect the current workspace and session state first. Do not repeat completed side effects. Finish the original workflow-node assignment and return the required final JSON object.",
+        "heartbeatSeconds": 300,
+        "stallSeconds": 3600,
+        "backoffSeconds": [300, 600, 1800, 3600]
+      },
+      "readArgs": [
+        "exec",
+        "-m",
+        "{model}",
+        "-c",
+        "sandbox_mode=\"read-only\"",
+        "--disable",
+        "multi_agent",
+        "{prompt}"
+      ],
+      "effort": {
+        "values": ["low", "medium", "high", "xhigh", "max", "ultra"],
+        "args": ["-c", "model_reasoning_effort=\"{effort}\""]
+      }
+    },
+    "codex": {
+      "bin": "codex",
+      "nativeProviderFamily": "codex",
+      "args": [
+        "exec",
+        "-m",
+        "{model}",
+        "--dangerously-bypass-approvals-and-sandbox",
+        "{prompt}"
+      ],
+      "session": {
+        "idSource": "jsonl-event",
+        "start": { "position": "after", "anchor": "exec", "args": ["--json"] },
+        "resume": { "position": "after", "anchor": "exec", "args": ["resume", "{sessionId}", "--json"] },
+        "eventType": "thread.started",
+        "eventIdField": "thread_id",
+        "output": "jsonl-agent-message",
+        "continuePrompt": "continue. Inspect the current workspace and session state first. Do not repeat completed side effects. Finish the original workflow-node assignment and return the required final JSON object.",
+        "heartbeatSeconds": 300,
+        "stallSeconds": 3600,
+        "backoffSeconds": [300, 600, 1800, 3600]
+      },
+      "readArgs": [
+        "exec",
+        "-m",
+        "{model}",
+        "-c",
+        "sandbox_mode=\"read-only\"",
+        "--disable",
+        "multi_agent",
+        "{prompt}"
+      ],
+      "schedulerArgs": [
+        "exec",
+        "-m",
+        "{model}",
+        "--sandbox",
+        "read-only",
+        "--disable",
+        "multi_agent",
+        "--ephemeral",
+        "--ignore-rules",
+        "--color",
+        "never",
+        "{prompt}"
+      ],
+      "effort": {
+        "values": ["low", "medium", "high", "xhigh", "max", "ultra"],
+        "args": ["-c", "model_reasoning_effort=\"{effort}\""]
+      }
+    },
+    "cursor": {
+      "bin": "cursor-agent",
+      "nativeProviderFamily": "cursor",
+      "args": [
+        "--print",
+        "--output-format",
+        "text",
+        "--model",
+        "{model}",
+        "--force",
+        "--trust",
+        "--disable-project-configs",
+        "--disable-auto-update",
+        "{prompt}"
+      ],
+      "readArgs": [
+        "--print",
+        "--output-format",
+        "text",
+        "--mode",
+        "plan",
+        "--model",
+        "{model}",
+        "--trust",
+        "--disable-project-configs",
+        "--disable-auto-update",
+        "--disable-indexing",
+        "--disable-codebase-ref",
+        "{prompt}"
+      ],
+      "session": {
+        "idSource": "create-stdout",
+        "createArgs": ["create-chat"],
+        "start": { "position": "start", "args": ["--resume", "{sessionId}"] },
+        "resume": { "position": "start", "args": ["--resume", "{sessionId}"] },
+        "output": "text",
+        "continuePrompt": "continue. Inspect the current workspace and session state first. Do not repeat completed side effects. Finish the original workflow-node assignment and return the required final JSON object.",
+        "heartbeatSeconds": 300,
+        "stallSeconds": 3600,
+        "backoffSeconds": [300, 600, 1800, 3600]
+      },
+      "effort": {
+        "values": ["none", "low", "medium", "high", "xhigh", "max"],
+        "encoding": "catalog-model-id"
+      },
+      "relayModelPrefixes": [
+        "auto",
+        "claude-",
+        "composer-",
+        "cursor-grok-",
+        "deepseek-",
+        "gemini-",
+        "glm-",
+        "grok-",
+        "gpt-",
+        "kimi-"
+      ]
+    },
+    "kimi": {
+      "bin": "kimi",
+      "nativeProviderFamily": "kimi",
+      "args": [
+        "-p",
+        "{prompt}",
+        "-m",
+        "{model}",
+        "-y",
+        "--output-format",
+        "text",
+        "--skills-dir",
+        ".claude/skills"
+      ],
+      "timeoutSeconds": 3600,
+      "backoffSeconds": [300, 600, 1800, 3600]
+    }
+  },
+  "modelPrefixes": {
+    "claude": "anthropic",
+    "composer": "cursor",
+    "cursor-grok": "cursor",
+    "deepseek": "cursor",
+    "gemini": "cursor",
+    "glm": "cursor",
+    "grok": "cursor",
+    "gpt": "codex",
+    "kimi": "kimi",
+    "k1": "kimi",
+    "k2": "kimi",
+    "k3": "kimi"
+  },
+  "upstreamModelFamilies": {
+    "gpt-5.6-sol": {
+      "upstreamProviderFamily": "openai",
+      "modelFamily": "gpt-5.6-sol",
+      "dispatchEligibility": "active"
+    },
+    "gpt-5.6-luna": {
+      "upstreamProviderFamily": "openai",
+      "modelFamily": "gpt-5.6-luna",
+      "dispatchEligibility": "active"
+    },
+    "gpt-6-astra": {
+      "upstreamProviderFamily": "openai",
+      "modelFamily": "gpt-6-astra",
+      "dispatchEligibility": "active"
+    },
+    "claude-opus-5": {
+      "upstreamProviderFamily": "anthropic",
+      "modelFamily": "claude-opus-5",
+      "dispatchEligibility": "active"
+    },
+    "claude-fable-5-1": {
+      "upstreamProviderFamily": "anthropic",
+      "modelFamily": "claude-fable-5-1",
+      "dispatchEligibility": "active"
+    },
+    "claude-sonnet-5": {
+      "upstreamProviderFamily": "anthropic",
+      "modelFamily": "claude-sonnet-5",
+      "dispatchEligibility": "active"
+    },
+    "kimi-k3": {
+      "upstreamProviderFamily": "moonshot",
+      "modelFamily": "kimi-k3",
+      "dispatchEligibility": "active",
+      "requiredEffortPolicy": "highest-available"
+    },
+    "glm-5.2": {
+      "upstreamProviderFamily": "zhipu",
+      "modelFamily": "glm-5.2",
+      "dispatchEligibility": "active",
+      "requiredEffortPolicy": "highest-available"
+    },
+    "cursor-grok-4.6": {
+      "upstreamProviderFamily": "xai",
+      "modelFamily": "grok-4.6",
+      "dispatchEligibility": "active",
+      "requiredEffortPolicy": "highest-available"
+    },
+    "grok-4.6": {
+      "upstreamProviderFamily": "xai",
+      "modelFamily": "grok-4.6",
+      "dispatchEligibility": "active",
+      "requiredEffortPolicy": "highest-available"
+    },
+    "deepseek": {
+      "upstreamProviderFamily": "deepseek",
+      "modelFamily": "deepseek",
+      "dispatchEligibility": "future-candidate",
+      "requiredEffortPolicy": "highest-available"
+    },
+    "composer-2.5": {
+      "upstreamProviderFamily": "cursor",
+      "modelFamily": "composer-2.5",
+      "dispatchEligibility": "excluded"
+    }
+  }
+}

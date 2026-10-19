@@ -1,0 +1,4 @@
+interface:
+  display_name: "Humanize Workflow"
+  short_description: "Safely map and run eligible workflows with humanize2"
+  default_prompt: "Use $humanize-workflow to map and run this eligible independent-review workflow with humanize2."

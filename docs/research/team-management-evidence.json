@@ -1,0 +1,342 @@
+{
+  "title": "Management evidence for heterogeneous model teams",
+  "retrievedAt": "2026-09-11",
+  "scope": "Research basis for task-specific dispatch in ElasticWeave; human and AI findings are kept separate.",
+  "records": [
+    {
+      "id": "kim2026",
+      "title": "Towards a Science of Scaling Agent Systems",
+      "authors": "Yubin Kim et al.",
+      "year": "2026",
+      "url": "https://arxiv.org/html/2512.08296v3",
+      "sourceClass": "primary preprint",
+      "accessStatus": "full HTML retrieved; named sections read",
+      "supportPointer": "abstract; sections 4.2-4.5; section 5 limitations; section 6 conclusion",
+      "claimType": "Fact",
+      "supportSummary": "Controlled evaluation of 260 configurations across six agentic benchmarks, five architectures and three LLM families. Relative multi-agent change ranged from positive on decomposable finance to negative on sequential planning. Capability saturation, tool coordination cost and centralized error containment are reported; model mixing evidence is preliminary.",
+      "uncertainty": "Preprint; only 13 preliminary mixed configurations on BrowseComp-Plus. Fixed prompts, six dataset clusters and 20-instance coding/terminal subsets limit inference. The 87% architecture-selection figure is within-domain, not demonstrated absolute cross-domain prediction.",
+      "retrievedAt": "2026-09-11",
+      "version": "arXiv:2512.08296v3, 2026-04-08"
+    },
+    {
+      "id": "garicano2000",
+      "title": "Hierarchies and the Organization of Knowledge in Production",
+      "authors": "Luis Garicano",
+      "year": "2000",
+      "url": "https://pdodds.w3.uvm.edu/files/papers/others/2000/garicano2000a.pdf",
+      "sourceClass": "primary journal paper, university-hosted copy",
+      "accessStatus": "full PDF retrieved; named sections read",
+      "supportPointer": "pp. 874-876; pp. 901-902 conclusion",
+      "claimType": "Fact",
+      "supportSummary": "A formal knowledge hierarchy routes common problems to production workers and exceptional problems to specialists. It trades knowledge acquisition against communication time and limits span of control. The model assumes homogeneous workers and observable problem flow; those are material limits for LLM teams.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.1086/317671",
+      "uncertainty": "Homogeneous workers and observable problem flow; a knowledge-cost model, not an empirical model-brand hierarchy."
+    },
+    {
+      "id": "garicano_rossi2005",
+      "title": "Organization and Inequality in a Knowledge Economy",
+      "authors": "Luis Garicano and Esteban Rossi-Hansberg",
+      "year": "2005",
+      "url": "https://www.nber.org/system/files/working_papers/w11458/w11458.pdf",
+      "sourceClass": "primary NBER working paper",
+      "accessStatus": "full PDF retrieved; named sections read",
+      "supportPointer": "abstract; introduction; sections 2.1-2.4, especially pp. 7-10",
+      "claimType": "Fact",
+      "supportSummary": "Heterogeneous workers specialize in production or problem solving. Communication and diagnosis cost constrain hierarchical span; if problem labeling is cheap, direct matching can replace hierarchy. Positive sorting is not perfect segregation.",
+      "uncertainty": "One-dimensional knowledge and stylized equilibrium; no direct agent-system result.",
+      "retrievedAt": "2026-09-11",
+      "version": "NBER w11458, June 2005; later journal version not used"
+    },
+    {
+      "id": "aghion_tirole1997",
+      "title": "Formal and Real Authority in Organizations",
+      "authors": "Philippe Aghion and Jean Tirole",
+      "year": "1997",
+      "url": "https://ideas.repec.org/a/ucp/jpolec/v105y1997i1p1-29.html",
+      "sourceClass": "publisher/RePEc primary abstract",
+      "accessStatus": "abstract only; full text restricted",
+      "supportPointer": "abstract",
+      "claimType": "Fact",
+      "supportSummary": "Formal and real authority differ; information structure affects real authority. More subordinate real authority promotes initiative but reduces principal control. Overload, urgency and measurement are analyzed as determinants.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.1086/262063",
+      "uncertainty": "Abstract-only theoretical result; human incentives and private information do not transfer literally to models."
+    },
+    {
+      "id": "dessein2002",
+      "title": "Authority and Communication in Organizations",
+      "authors": "Wouter Dessein",
+      "year": "2002",
+      "url": "https://ideas.repec.org/a/oup/restud/v69y2002i4p811-838.html",
+      "sourceClass": "publisher/RePEc primary abstract",
+      "accessStatus": "abstract only; full text restricted",
+      "supportPointer": "abstract",
+      "claimType": "Fact",
+      "supportSummary": "Delegation can dominate communication when the agent is better informed and incentive conflict is limited. The model also discusses intermediary delegation and veto rights.",
+      "uncertainty": "Conditional model; does not justify unbounded model authority or removal of review.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.1111/1467-937X.00227"
+    },
+    {
+      "id": "bloom2011",
+      "title": "Does Management Matter? Evidence from India",
+      "authors": "Nicholas Bloom et al.",
+      "year": "2011",
+      "url": "https://www.nber.org/system/files/working_papers/w16658/w16658.pdf",
+      "sourceClass": "primary randomized field experiment working paper",
+      "accessStatus": "full PDF retrieved; named sections read",
+      "supportPointer": "abstract; introduction; section VI.A; table 3",
+      "claimType": "Fact",
+      "supportSummary": "A management intervention in Indian textile plants improved productivity and information practices; delegation increased alongside better monitoring. The sample is small and decentralization mechanism evidence is more fragile than headline productivity wording.",
+      "retrievedAt": "2026-09-11",
+      "version": "NBER w16658, January 2011; later journal version not used",
+      "uncertainty": "The delegation ITT permutation p-value is 0.06 and IV permutation confidence interval includes zero in table 3. Human plants, not AI teams; numerical findings from later versions must not be substituted."
+    },
+    {
+      "id": "kremer1993",
+      "title": "The O-Ring Theory of Economic Development",
+      "authors": "Michael Kremer",
+      "year": "1993",
+      "url": "https://ideas.repec.org/a/oup/qjecon/v108y1993i3p551-575..html",
+      "sourceClass": "publisher/RePEc primary abstract",
+      "accessStatus": "abstract only; full text restricted",
+      "supportPointer": "abstract",
+      "claimType": "Fact",
+      "supportSummary": "A model of multi-task production with consequential mistakes gives conditional positive sorting of high-skill workers and steep skill-output complementarity.",
+      "uncertainty": "Complementarity and costly errors are assumptions; does not prohibit mixed-skill teams.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.2307/2118400"
+    },
+    {
+      "id": "wageman2001",
+      "title": "How Leaders Foster Self-Managing Team Effectiveness",
+      "authors": "Ruth Wageman",
+      "year": "2001",
+      "url": "https://pubsonline.informs.org/doi/10.1287/orsc.12.5.559.10094",
+      "sourceClass": "primary field study publisher page",
+      "accessStatus": "abstract read; full paper not read",
+      "supportPointer": "abstract",
+      "claimType": "Fact",
+      "supportSummary": "Team design choices and hands-on coaching both affect self-management and relationships, while the abstract reports design activities affect task performance; design and coaching interact.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.1287/orsc.12.5.559.10094",
+      "uncertainty": "Only the publisher abstract was read; a field study does not establish that coaching never affects performance."
+    },
+    {
+      "id": "lorinkova2013",
+      "title": "Examining the Differential Longitudinal Performance of Directive Versus Empowering Leadership in Teams",
+      "authors": "Natalia M. Lorinkova, Matthew J. Pearsall and Henry P. Sims Jr.",
+      "year": "2013",
+      "url": "https://leeds-faculty.colorado.edu/dahe7472/Lorinkova%20573.full.pdf",
+      "sourceClass": "primary laboratory experiment university-hosted copy",
+      "accessStatus": "full PDF retrieved; named sections read",
+      "supportPointer": "abstract; methods pp. 580-581; discussion and limitations pp. 590-591",
+      "claimType": "Fact",
+      "supportSummary": "Sixty five-person teams performed a ten-round computer simulation. Directive leadership had better early performance; empowering teams improved more over time through learning, coordination and mental-model development. Teams were short-lived, highly interdependent and led by inexperienced leaders.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.5465/amj.2011.0132",
+      "uncertainty": "Short-lived, highly interdependent laboratory teams; no evidence here that switching directive to empowering leadership is a generally optimal sequence."
+    },
+    {
+      "id": "hong_page2004",
+      "title": "Groups of Diverse Problem Solvers Can Outperform Groups of High-Ability Problem Solvers",
+      "authors": "Lu Hong and Scott E. Page",
+      "year": "2004",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC528939/",
+      "sourceClass": "primary mathematical model and computational simulation",
+      "accessStatus": "full HTML retrieved; named sections read",
+      "supportPointer": "abstract; model; computational experiment; theorem; concluding remarks",
+      "claimType": "Fact",
+      "supportSummary": "Under explicit assumptions about intelligence, difficulty, functional diversity and a unique best agent, a random diverse group can outperform the individually best group. The paper is a mathematical/computational result, not a human field experiment, and leaves communication and learning out of the core model.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.1073/pnas.0403723101",
+      "uncertainty": "Conditional theorem and simulation; ignores communication and learning, assumes capable improvement-seeking agents. Not a human experiment."
+    },
+    {
+      "id": "stasser_titus1985",
+      "title": "Pooling of Unshared Information in Group Decision Making",
+      "authors": "Garold Stasser and William Titus",
+      "year": "1985",
+      "url": "https://www.uni-muenster.de/imperia/md/content/psyifp/aeechterhoff/vorlesungkommunikation/stasser_titus_unsharedinfogroupdisc_jpsp1985.pdf",
+      "sourceClass": "primary laboratory simulation",
+      "accessStatus": "full PDF retrieved; named sections read",
+      "supportPointer": "abstract; discussion pp. 1476-1477",
+      "claimType": "Fact",
+      "supportSummary": "In a political-caucus simulation, discussion favored shared and preference-confirming information; groups failed to pool available unshared information and retained initial preferences.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.1037/0022-3514.48.6.1467",
+      "uncertainty": "Controlled human choice task and recall measures; does not directly establish LLM groupthink or optimal prompt ordering."
+    },
+    {
+      "id": "lewis2003",
+      "title": "Measuring Transactive Memory Systems in the Field",
+      "authors": "Kyle Lewis",
+      "year": "2003",
+      "url": "https://www.researchgate.net/publication/10597070_Measuring_Transactive_Memory_Systems_in_the_Field_Scale_Development_and_Validation",
+      "sourceClass": "primary validation study author-uploaded full text/abstract",
+      "accessStatus": "author-uploaded full text available; named sections read",
+      "supportPointer": "abstract; definition pp. 590-591; discussion and limitations pp. 600-602; scale appendix",
+      "claimType": "Fact",
+      "supportSummary": "A 15-item transactive-memory measure was validated in laboratory, MBA consulting and technology-company teams. The construct concerns knowing who knows what plus specialization, credibility and coordination; the paper warns that excessive specialization creates isolated expertise and that boundaries remain.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.1037/0021-9010.88.4.587",
+      "uncertainty": "Measure-validation evidence, including a small technology-company sample. Trust and specialization can become rigid; no proof that a roster alone improves a model team."
+    },
+    {
+      "id": "edmondson1999",
+      "title": "Psychological Safety and Learning Behavior in Work Teams",
+      "authors": "Amy Edmondson",
+      "year": "1999",
+      "url": "https://web.mit.edu/curhan/www/docs/Articles/15341_Readings/Group_Performance/Edmondson%20Psychological%20safety.pdf",
+      "sourceClass": "primary field study university-hosted copy",
+      "accessStatus": "full PDF retrieved; named sections read",
+      "supportPointer": "abstract; study limitations pp. 377-378",
+      "claimType": "Fact",
+      "supportSummary": "A study of 51 manufacturing work teams associated psychological safety with learning behavior, which mediated performance. Cross-sectional design prevents causal claims and the mechanism is conditional on task structure.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.2307/2666999",
+      "uncertainty": "Cross-sectional human-team evidence; causal direction and model-emotion analogy are not established."
+    },
+    {
+      "id": "kalyuga2003",
+      "title": "The Expertise Reversal Effect",
+      "authors": "Slava Kalyuga, Paul Ayres, Paul Chandler and John Sweller",
+      "year": "2003",
+      "url": "https://mrbartonmaths.com/resourcesnew/8.%20Research/Explicit%20Instruction/The%20Expertise%20Reversal%20Effect.pdf",
+      "sourceClass": "original authors review of empirical studies; university repository copy hosted on an educational site, not independent reanalysis of underlying experiments",
+      "accessStatus": "full PDF retrieved; named sections read",
+      "supportPointer": "abstract; pp. 23-24; conclusion pp. 28-29",
+      "claimType": "Fact",
+      "supportSummary": "Instruction that helps inexperienced learners can become redundant or harmful for experienced learners. The review argues instruction should be tailored to prior knowledge; this is an educational human-cognition finding, not a direct model-context law.",
+      "retrievedAt": "2026-09-11",
+      "doi": "10.1207/S15326985EP3801_4",
+      "uncertainty": "Original review, not a new single experiment. Underlying studies were not re-audited; model inference is not human schema learning."
+    },
+    {
+      "id": "anthropic2025",
+      "title": "How We Built Our Multi-Agent Research System",
+      "authors": "Anthropic engineering",
+      "year": "2025",
+      "url": "https://www.anthropic.com/engineering/multi-agent-research-system",
+      "sourceClass": "official engineering report",
+      "accessStatus": "full page read",
+      "supportPointer": "sections benefits, architecture, prompt engineering and evaluation",
+      "claimType": "Fact",
+      "supportSummary": "Anthropic reports that explicit subtask boundaries, output formats, tool/source guidance, effort scaling and early small-sample evaluation improved its own research system. It also reports high token overhead and poor fit for dependency-heavy work; internal results are not independent evidence for ElasticWeave.",
+      "retrievedAt": "2026-09-11",
+      "uncertainty": "Vendor-reported engineering observations and internal evaluations; not an independent matched-budget experiment on ElasticWeave."
+    }
+  ],
+  "synthesis": [
+    {
+      "id": "S1",
+      "claimType": "Inference",
+      "statement": "Capability should be calibrated per task across competence, autonomy, coordination reliability, verification cost and error correlation; a brand name is not a universal tier.",
+      "sources": [
+        "kim2026",
+        "garicano_rossi2005",
+        "lewis2003"
+      ]
+    },
+    {
+      "id": "S2",
+      "claimType": "Extrapolation",
+      "statement": "Give a demonstrated expert method discretion while retaining user-owned goal, acceptance and independent verdict; give support members bounded contracts and escalate new decisions.",
+      "sources": [
+        "aghion_tirole1997",
+        "dessein2002",
+        "wageman2001"
+      ]
+    },
+    {
+      "id": "S3",
+      "claimType": "Extrapolation",
+      "statement": "Use independent work before synthesis when alternatives or evidence may be hidden; require raw evidence, counterexamples and unresolved disagreement at fan-in.",
+      "sources": [
+        "hong_page2004",
+        "stasser_titus1985",
+        "lewis2003"
+      ]
+    },
+    {
+      "id": "S4",
+      "claimType": "Extrapolation",
+      "statement": "For weak or unknown routes, start with a small real reversible task, provide relevant scaffolding and reduce guidance after evidence of competence; repeated failure triggers diagnosis or escalation rather than blind retries.",
+      "sources": [
+        "kalyuga2003",
+        "lorinkova2013",
+        "kim2026"
+      ]
+    },
+    {
+      "id": "S5",
+      "claimType": "Extrapolation",
+      "statement": "Parallelism is justified by task independence and expected information gain after coordination cost, not by agent count; reserve reducer/reviewer capacity and measure rework and error propagation.",
+      "sources": [
+        "kim2026",
+        "garicano2000",
+        "anthropic2025"
+      ]
+    }
+  ],
+  "gaps": [
+    "No task-level controlled comparison of ElasticWeave's routes has been run in this research round.",
+    "No source establishes a fixed global ranking of Astra, Opus, Sonnet or other model families.",
+    "Human delegation, psychological safety and expertise-reversal findings do not identify causal model mechanisms.",
+    "Kim et al. v3 is a preprint with limited heterogeneous configurations and benchmark subsets; long-horizon and project-specific transfer remain open.",
+    "Aghion-Tirole, Dessein, Kremer and Wageman were read only at original-abstract level.",
+    "Kalyuga is a review article; its individual underlying experiments were not independently re-reviewed."
+  ],
+  "schemaVersion": "team-management-evidence/v1",
+  "accessNote": "Research collected on 2026-09-10 and verified on 2026-09-11. Browser access and direct HTTP were used. Full text available does not mean every section or cited underlying study was read; each record names the inspected sections.",
+  "claimTypes": {
+    "Fact": "Directly reported in the named source; not necessarily a causal finding.",
+    "Inference": "Reasoned conclusion from named sources.",
+    "Extrapolation": "Proposed transfer to model-team operation, requiring task-level validation."
+  },
+  "correctionsToProvisionalNotes": [
+    "Discarded the outdated 180-configuration/four-benchmark arXiv v1 summary; pinned Kim v3.",
+    "Corrected Lewis DOI from the erroneous issue-3 identifier to 10.1037/0021-9010.88.4.587; transactive memory is not shared mental models.",
+    "Corrected Wageman DOI suffix to 10094.",
+    "Hong-Page is a mathematical model and computational simulation, not a human-team experiment."
+  ],
+  "researchDecision": {
+    "status": "proceed_with_bounded_policy_adaptation; efficacy_unresolved",
+    "reason": "The evidence rejects unconditional scaling, fixed global tiers and literal human-to-LLM transfer. It supports testable task-specific management mechanisms with visible limitations, not a performance promise."
+  },
+  "criticalAssumptions": [
+    {
+      "id": "A1",
+      "statement": "Increasing agent count reliably improves quality.",
+      "falsifier": "Matched task/compute conditions with worse multi-agent outcomes.",
+      "sources": [
+        "kim2026"
+      ],
+      "disposition": "Rejected as universal; condition dispatch on task structure and measure cost."
+    },
+    {
+      "id": "A2",
+      "statement": "A global model ranking suffices for assigning expertise and authority.",
+      "falsifier": "Task, role, context or coordination differences reverse useful contribution.",
+      "sources": [
+        "garicano2000",
+        "garicano_rossi2005",
+        "lewis2003",
+        "kim2026"
+      ],
+      "disposition": "Unsupported; use task-scoped evidence and retain uncertainty."
+    },
+    {
+      "id": "A3",
+      "statement": "Human management findings prove this model policy improves delivery.",
+      "falsifier": "Missing model-specific causal test or failure in project holdouts.",
+      "sources": [
+        "lorinkova2013",
+        "kalyuga2003",
+        "edmondson1999"
+      ],
+      "disposition": "Transfer remains an extrapolation; evaluate separately from instruction propagation."
+    }
+  ]
+}

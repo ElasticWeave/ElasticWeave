@@ -1,0 +1,613 @@
+{
+  "schema": "workflow-design/v1",
+  "id": "review-gated-loop",
+  "entry": "seed",
+  "goal": {
+    "objective": "Run one controller-owned, statically bounded implement-review workflow with byte evidence, fresh independent verdicts, and state-bound completion proof.",
+    "acceptance": "The supplied focused-check argv succeeds without shell interpretation, the final workspace-writing attempt is covered by a fresh reviewer PASS against the task criteria, the archive node emits only a proof candidate, and the controller binds the final proof to the reviewed workspace bytes."
+  },
+  "admission": {
+    "reasons": [
+      "multi-stage",
+      "machine-gated-review",
+      "protected-control-plane",
+      "long-running"
+    ],
+    "demotionCondition": "Use a native implementer plus an independent reviewer when machine-controlled revision routing, byte-evidence binding, durable recovery, and protected proof finalization are unnecessary."
+  },
+  "governance": {
+    "reviewPolicy": "machine-gated",
+    "completionProof": "state-bound",
+    "malformedDecision": "unresolved"
+  },
+  "budgets": {
+    "maxModelCalls": 6,
+    "maxReviewCycles": 3
+  },
+  "requiredCapabilities": [
+    "agent-invocation",
+    "fresh-sessions",
+    "interrupted-session-resume",
+    "stateful-continuation",
+    "conditional-routing",
+    "structured-output",
+    "durable-checkpoints",
+    "observability",
+    "machine-gated-review",
+    "state-bound-proof"
+  ],
+  "state": [
+    {
+      "name": "itemId",
+      "type": "string",
+      "source": "input"
+    },
+    {
+      "name": "task",
+      "type": "string",
+      "source": "input"
+    },
+    {
+      "name": "acceptanceArgv",
+      "type": "array",
+      "source": "input"
+    },
+    {
+      "name": "rewardHackingRisks",
+      "type": "array",
+      "source": "input",
+      "maxItems": 5,
+      "itemType": "string",
+      "maxItemBytes": 2048,
+      "uniqueItems": true
+    },
+    {
+      "name": "implementationSummary",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "reviewFeedback",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "lastReviewNode",
+      "type": "string",
+      "source": "controller"
+    },
+    {
+      "name": "revisionCount",
+      "type": "number",
+      "source": "controller"
+    },
+    {
+      "name": "baselinePath",
+      "type": "string",
+      "source": "capture-baseline"
+    },
+    {
+      "name": "baselineSummary",
+      "type": "string",
+      "source": "capture-baseline"
+    },
+    {
+      "name": "baselineDigest",
+      "type": "string",
+      "source": "capture-baseline"
+    },
+    {
+      "name": "evidence",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "evidencePath",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "evidenceDigest",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "stateBinding",
+      "type": "string",
+      "source": "workflow"
+    },
+    {
+      "name": "proofCandidatePath",
+      "type": "string",
+      "source": "archive-proof"
+    },
+    {
+      "name": "forcedReason",
+      "type": "string",
+      "source": "controller"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "seed",
+      "kind": "script",
+      "reads": [],
+      "writes": [
+        "itemId",
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "implementationSummary",
+        "revisionCount",
+        "reviewFeedback",
+        "lastReviewNode",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "capture-baseline",
+      "kind": "script",
+      "workspaceAccess": "read",
+      "reads": [
+        "itemId"
+      ],
+      "writes": [
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "implement-r0",
+      "kind": "agent",
+      "role": "task",
+      "session": "fresh",
+      "workspaceAccess": "write",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "implementationSummary",
+        "reviewFeedback",
+        "lastReviewNode",
+        "revisionCount"
+      ],
+      "writes": [
+        "implementationSummary"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "capture-evidence-r0",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "review-r0",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "implementationSummary",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "BLOCK"
+      ],
+      "reviews": [
+        "implement-r0",
+        "capture-evidence-r0"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "advance-r0",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback",
+        "revisionCount"
+      ],
+      "writes": [
+        "revisionCount",
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "implement-r1",
+      "kind": "agent",
+      "role": "task",
+      "session": "state-mediated",
+      "workspaceAccess": "write",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "implementationSummary",
+        "reviewFeedback",
+        "lastReviewNode",
+        "revisionCount"
+      ],
+      "writes": [
+        "implementationSummary"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "capture-evidence-r1",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "review-r1",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "implementationSummary",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "BLOCK"
+      ],
+      "reviews": [
+        "implement-r0",
+        "capture-evidence-r0",
+        "implement-r1",
+        "capture-evidence-r1"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "advance-r1",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback",
+        "revisionCount"
+      ],
+      "writes": [
+        "revisionCount",
+        "lastReviewNode"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "implement-r2",
+      "kind": "agent",
+      "role": "task",
+      "session": "state-mediated",
+      "workspaceAccess": "write",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "implementationSummary",
+        "reviewFeedback",
+        "lastReviewNode",
+        "revisionCount"
+      ],
+      "writes": [
+        "implementationSummary"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "capture-evidence-r2",
+      "kind": "script",
+      "workspaceAccess": "write",
+      "reads": [
+        "acceptanceArgv",
+        "baselinePath",
+        "baselineDigest"
+      ],
+      "writes": [
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "timeoutSeconds": 18000
+    },
+    {
+      "id": "review-r2",
+      "kind": "decision",
+      "role": "advisor",
+      "session": "fresh",
+      "workspaceAccess": "read",
+      "reads": [
+        "task",
+        "acceptanceArgv",
+        "rewardHackingRisks",
+        "implementationSummary",
+        "baselinePath",
+        "baselineSummary",
+        "baselineDigest",
+        "evidence",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding"
+      ],
+      "writes": [
+        "reviewFeedback"
+      ],
+      "outcomes": [
+        "PASS",
+        "REVISE",
+        "BLOCK"
+      ],
+      "reviews": [
+        "implement-r0",
+        "capture-evidence-r0",
+        "implement-r1",
+        "capture-evidence-r1",
+        "implement-r2",
+        "capture-evidence-r2"
+      ],
+      "onMissing": "unresolved",
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "exhaust-revisions",
+      "kind": "script",
+      "reads": [
+        "reviewFeedback",
+        "revisionCount"
+      ],
+      "writes": [
+        "revisionCount",
+        "lastReviewNode",
+        "forcedReason"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "archive-proof",
+      "kind": "script",
+      "reads": [
+        "itemId",
+        "baselinePath",
+        "baselineDigest",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding",
+        "reviewFeedback"
+      ],
+      "writes": [
+        "proofCandidatePath"
+      ],
+      "timeoutSeconds": 7200
+    },
+    {
+      "id": "success",
+      "kind": "terminal",
+      "outcome": "success",
+      "reads": [
+        "itemId",
+        "implementationSummary",
+        "reviewFeedback",
+        "evidencePath",
+        "evidenceDigest",
+        "stateBinding",
+        "proofCandidatePath"
+      ],
+      "writes": []
+    },
+    {
+      "id": "unresolved",
+      "kind": "terminal",
+      "outcome": "unresolved",
+      "reads": [
+        "reviewFeedback",
+        "lastReviewNode",
+        "revisionCount",
+        "forcedReason"
+      ],
+      "writes": []
+    }
+  ],
+  "transitions": [
+    {
+      "from": "seed",
+      "to": "capture-baseline"
+    },
+    {
+      "from": "capture-baseline",
+      "to": "implement-r0"
+    },
+    {
+      "from": "implement-r0",
+      "to": "capture-evidence-r0"
+    },
+    {
+      "from": "capture-evidence-r0",
+      "to": "review-r0"
+    },
+    {
+      "from": "review-r0",
+      "to": "archive-proof",
+      "when": {
+        "field": "review-r0.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "review-r0",
+      "to": "advance-r0",
+      "when": {
+        "field": "review-r0.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "review-r0",
+      "to": "unresolved",
+      "when": {
+        "field": "review-r0.verdict",
+        "equals": "BLOCK"
+      }
+    },
+    {
+      "from": "advance-r0",
+      "to": "implement-r1"
+    },
+    {
+      "from": "implement-r1",
+      "to": "capture-evidence-r1"
+    },
+    {
+      "from": "capture-evidence-r1",
+      "to": "review-r1"
+    },
+    {
+      "from": "review-r1",
+      "to": "archive-proof",
+      "when": {
+        "field": "review-r1.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "review-r1",
+      "to": "advance-r1",
+      "when": {
+        "field": "review-r1.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "review-r1",
+      "to": "unresolved",
+      "when": {
+        "field": "review-r1.verdict",
+        "equals": "BLOCK"
+      }
+    },
+    {
+      "from": "advance-r1",
+      "to": "implement-r2"
+    },
+    {
+      "from": "implement-r2",
+      "to": "capture-evidence-r2"
+    },
+    {
+      "from": "capture-evidence-r2",
+      "to": "review-r2"
+    },
+    {
+      "from": "review-r2",
+      "to": "archive-proof",
+      "when": {
+        "field": "review-r2.verdict",
+        "equals": "PASS"
+      }
+    },
+    {
+      "from": "review-r2",
+      "to": "exhaust-revisions",
+      "when": {
+        "field": "review-r2.verdict",
+        "equals": "REVISE"
+      }
+    },
+    {
+      "from": "review-r2",
+      "to": "unresolved",
+      "when": {
+        "field": "review-r2.verdict",
+        "equals": "BLOCK"
+      }
+    },
+    {
+      "from": "exhaust-revisions",
+      "to": "unresolved"
+    },
+    {
+      "from": "archive-proof",
+      "to": "success"
+    }
+  ],
+  "terminals": {
+    "success": "success",
+    "unresolved": "unresolved"
+  },
+  "sideEffects": [
+    {
+      "owner": "implement-r0|implement-r1|implement-r2",
+      "effect": "workspace writes",
+      "recovery": "Each fresh or state-mediated attempt is keyed by run and node id. After interruption, inspect the controller checkpoint and byte evidence; never replay an ambiguous writer automatically."
+    },
+    {
+      "owner": "capture-baseline|capture-evidence-r0|capture-evidence-r1|capture-evidence-r2",
+      "effect": "write run-scoped byte evidence",
+      "recovery": "The controller freezes helper bytes and reconciles run-scoped evidence by digest before any review or resume."
+    },
+    {
+      "owner": "archive-proof",
+      "effect": "write an unprivileged proof candidate marker",
+      "recovery": "The controller verifies terminal state, final reviewed bytes, verdict digest, and call ledger before idempotently finalizing the protected PM proof."
+    }
+  ],
+  "evidence": [
+    "frozen pre-write baseline path and digest",
+    "post-write byte diff and acceptance output after every implementation attempt",
+    "fresh independent reviewer verdict bound to the current evidence digest",
+    "controller call ledger and terminal checkpoint",
+    "unprivileged proof candidate followed by controller-finalized state-bound PM proof"
+  ]
+}

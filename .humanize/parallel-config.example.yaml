@@ -1,0 +1,11 @@
+branches:
+  - name: implementation
+    task: "Implement the bounded proposal"
+    executor_skills: [implementation, first-principles]
+    reviewer_skills: [review, analysis]
+  - name: independent-check
+    task: "Independently test the proposal and its measurement"
+    executor_skills: [research, analysis]
+    reviewer_skills: [review, first-principles]
+max_concurrency: 2
+keep_workspaces: false

@@ -1,0 +1,542 @@
+{
+  "schema": "workflow-model-roles/v3",
+  "catalogResolution": {
+    "schema": "workflow-model-catalog-resolution/v1",
+    "status": "bootstrap-unverified",
+    "source": "authenticated-native-cli",
+    "verifiedBackends": [],
+    "verifiedRoles": []
+  },
+  "auditedModelIdentities": {
+    "schema": "workflow-model-identity-map/v1",
+    "assurance": "static-family-binding-not-live-availability-or-authentication",
+    "bindings": [
+      {
+        "backend": "codex",
+        "provider": "codex",
+        "upstreamProviderFamily": "openai",
+        "model": "gpt-5.6-luna",
+        "modelFamily": "gpt-5.6-luna"
+      },
+      {
+        "backend": "codex",
+        "provider": "codex",
+        "upstreamProviderFamily": "openai",
+        "model": "gpt-5.6-sol",
+        "modelFamily": "gpt-5.6-sol"
+      },
+      {
+        "backend": "codex",
+        "provider": "codex",
+        "upstreamProviderFamily": "openai",
+        "model": "gpt-6-astra",
+        "modelFamily": "gpt-6-astra"
+      },
+      {
+        "backend": "claude",
+        "provider": "anthropic",
+        "upstreamProviderFamily": "anthropic",
+        "model": "claude-opus-5",
+        "modelFamily": "claude-opus-5"
+      },
+      {
+        "backend": "cursor",
+        "provider": "cursor",
+        "upstreamProviderFamily": "anthropic",
+        "model": "claude-sonnet-5",
+        "modelFamily": "claude-sonnet-5"
+      },
+      {
+        "backend": "cursor",
+        "provider": "cursor",
+        "upstreamProviderFamily": "anthropic",
+        "model": "claude-opus-5",
+        "modelFamily": "claude-opus-5"
+      },
+      {
+        "backend": "cursor",
+        "provider": "cursor",
+        "upstreamProviderFamily": "anthropic",
+        "model": "claude-fable-5-1",
+        "modelFamily": "claude-fable-5-1"
+      },
+      {
+        "backend": "cursor",
+        "provider": "cursor",
+        "upstreamProviderFamily": "zhipu",
+        "model": "glm-5.2-max",
+        "modelFamily": "glm-5.2"
+      },
+      {
+        "backend": "cursor",
+        "provider": "cursor",
+        "upstreamProviderFamily": "moonshot",
+        "model": "kimi-k3-max",
+        "modelFamily": "kimi-k3"
+      },
+      {
+        "backend": "cursor",
+        "provider": "cursor",
+        "upstreamProviderFamily": "xai",
+        "model": "grok-4.6",
+        "modelFamily": "grok-4.6"
+      }
+    ]
+  },
+  "capabilityPolicy": {
+    "schema": "workflow-capability-policy/v1",
+    "liveResolution": {
+      "requiredAtInit": true,
+      "exactIdsAreRefreshableSnapshots": true,
+      "candidateAvailabilityIsNotFact": true,
+      "missing": "fail-closed",
+      "ambiguous": "fail-closed",
+      "unsupportedEffort": "fail-closed"
+    },
+    "taskClasses": {
+      "topIntelligence": {
+        "preferredExecutorRole": "frontier_execute",
+        "qualifiedRoles": ["frontier_execute", "frontier_execute_xhigh", "frontier_execute_anthropic", "frontier_execute_anthropic_xhigh"],
+        "allowedEfforts": ["max", "xhigh"],
+        "preferredAdviceRole": "frontier_advice",
+        "qualifiedAdviceRoles": ["frontier_advice", "frontier_advice_fable", "frontier_advice_astra"]
+      },
+      "collection": {
+        "qualifiedRoles": ["research_collect_anthropic", "research_collect"],
+        "routingGoal": "cost-sensitive-evidence-collection"
+      },
+      "diversityReview": {
+        "roles": ["diversity_kimi", "diversity_glm", "diversity_grok"],
+        "requiredEffort": "highest-available",
+        "activeHarnesses": ["subagent-scheduler"],
+        "unsupportedHarnessBehavior": "ineligible-no-substitution"
+      }
+    },
+    "taskClassRoles": {
+      "mechanical": ["smol", "tiny", "commit"],
+      "collection": ["research_collect", "research_collect_anthropic"],
+      "analysis": ["research_analyze", "task", "default", "vision", "anthropic_task"],
+      "planning": ["plan", "designer", "slow"],
+      "topIntelligence": ["frontier_execute", "frontier_execute_xhigh", "frontier_execute_anthropic", "frontier_execute_anthropic_xhigh"],
+      "advice": ["frontier_advice", "frontier_advice_fable", "frontier_advice_astra"],
+      "verification": ["advisor", "codex_advisor"],
+      "diversityReview": ["diversity_glm", "diversity_kimi", "diversity_grok"]
+    },
+    "reviewPairings": [
+      {
+        "writer": {
+          "upstreamProviderFamily": "openai",
+          "modelFamily": "gpt-6-astra",
+          "efforts": ["max", "xhigh"]
+        },
+        "reviewer": {
+          "role": "advisor",
+          "upstreamProviderFamily": "anthropic",
+          "modelFamily": "claude-opus-5",
+          "effort": "max"
+        }
+      },
+      {
+        "writer": {
+          "upstreamProviderFamily": "anthropic",
+          "modelFamily": "claude-opus-5",
+          "efforts": ["max", "xhigh"]
+        },
+        "reviewer": {
+          "role": "codex_advisor",
+          "upstreamProviderFamily": "openai",
+          "modelFamily": "gpt-6-astra",
+          "effort": "max"
+        }
+      }
+    ],
+    "providerReviewerDefaults": {
+      "openai": {
+        "reviewerRole": "advisor",
+        "requiredEffort": "max"
+      },
+      "anthropic": {
+        "reviewerRole": "codex_advisor",
+        "requiredEffort": "max"
+      }
+    },
+    "futureCandidates": [
+      {
+        "upstreamProviderFamily": "deepseek",
+        "modelFamily": "deepseek",
+        "backend": "cursor",
+        "requiredEffort": "highest-available",
+        "activation": "live-catalog-model-and-highest-effort-required"
+      }
+    ],
+    "excludedFamilies": [
+      {
+        "modelFamily": "composer-2.5",
+        "activation": "manual-policy-change-required"
+      }
+    ]
+  },
+  "reasoningPolicy": {
+    "schema": "workflow-reasoning-policy/v2",
+    "defaultPosture": "balanced",
+    "selectionRule": "lowest-cost-qualified-role",
+    "costMetric": "project-relative-routing-rank-not-dollar-price",
+    "effortScope": "global-dispatch-envelope",
+    "crossFamilyEffortComparable": false,
+    "maxAutomaticEscalations": 0,
+    "backendEffortLevels": {
+      "claude": ["low", "medium", "high", "xhigh", "max"],
+      "codex": ["low", "medium", "high", "xhigh", "max", "ultra"],
+      "cursor": ["none", "low", "medium", "high", "xhigh", "max"]
+    },
+    "postures": {
+      "economy": {
+        "description": "Keep the main judgment route qualified and move bounded collection to verified Sonnet High or Luna Max roles.",
+        "allowedRoles": ["smol", "tiny", "commit", "research_collect", "research_collect_anthropic", "research_analyze", "anthropic_task", "advisor", "codex_advisor"],
+        "maxAutomaticEscalations": 0
+      },
+      "balanced": {
+        "description": "Prefer GPT-6 Astra Max for the main executor, Opus 5 Max for advice or cross-provider review, and cost-qualified collection roles for evidence gathering.",
+        "allowedRoles": ["smol", "tiny", "commit", "research_collect", "research_collect_anthropic", "research_analyze", "anthropic_task", "default", "vision", "plan", "slow", "task", "designer", "frontier_execute", "frontier_advice", "frontier_advice_astra", "advisor", "codex_advisor"],
+        "maxAutomaticEscalations": 0
+      },
+      "frontier": {
+        "description": "Use only verified Astra or Opus top-intelligence routes at Max or X-High and preserve exact cross-provider Max review pairings.",
+        "allowedRoles": ["smol", "tiny", "commit", "research_collect", "research_collect_anthropic", "research_analyze", "anthropic_task", "default", "vision", "plan", "slow", "task", "designer", "frontier_execute", "frontier_execute_xhigh", "frontier_execute_anthropic", "frontier_execute_anthropic_xhigh", "frontier_advice", "frontier_advice_fable", "frontier_advice_astra", "diversity_grok", "advisor", "codex_advisor"],
+        "maxAutomaticEscalations": 0
+      }
+    },
+    "intelligenceClasses": {
+      "mechanical": ["smol", "tiny", "commit"],
+      "collection": ["research_collect", "research_collect_anthropic"],
+      "analysis": ["research_analyze", "task", "default", "vision", "anthropic_task"],
+      "topIntelligence": ["frontier_execute", "frontier_execute_xhigh", "frontier_execute_anthropic", "frontier_execute_anthropic_xhigh"],
+      "planning": ["plan", "designer", "slow"],
+      "advice": ["frontier_advice", "frontier_advice_fable", "frontier_advice_astra"],
+      "verification": ["advisor", "codex_advisor"],
+      "diversity": ["diversity_glm", "diversity_kimi", "diversity_grok"]
+    },
+    "rules": [
+      "Choose the global posture once per issue or workflow and include it in every delegated brief.",
+      "Use GPT-6 Astra Max as the preferred main executor; Astra X-High and Opus 5 Max or X-High are qualified alternatives only after live role resolution.",
+      "Use Opus 5 for normal complex advice and Fable 5.1 or GPT-6 Astra for hard or materially uncertain advice or review after exact live route and retention-policy admission.",
+      "Route bounded evidence collection to a live-verified Sonnet 5 High or Luna Max role instead of copying the main executor into collection leaves.",
+      "Choose the cheapest qualified semantic role for each node and escalate only the failing judgment node, not deterministic reducers or independent collection branches.",
+      "Treat effort names as provider-local settings; matching labels are requirements, not proof of cross-family capability equivalence.",
+      "Completion review keeps its exact Max pairing; adaptive advice and diversity roles prefer Max and otherwise pin the highest fresh-catalog effort before dispatch.",
+      "For a GPT-6 Astra Max or X-High writer use Opus 5 Max review; for an Opus 5 Max or X-High writer use GPT-6 Astra Max review.",
+      "The shipped diversity_glm (GLM 5.2) and diversity_kimi (kimi-k3-max) entries are immutable Cursor compatibility snapshots; current GLM 5.3/5.3 Flash and Kimi k3 candidates follow the task-routing heuristic and must be admitted through their declared Claude Code route before dispatch. Grok 4.6 remains active only at the highest effort proven by the fresh Cursor catalog, and Humanize cannot substitute another backend.",
+      "DeepSeek V4.1 Flash follows the task-routing heuristic through DSH or Codex as deepseek-flash; a separate Cursor candidate requires its exact model and highest provider-local effort in the live catalog. Composer 2.5 remains excluded until an explicit policy change.",
+      "A workflow scheduler selects only from the legal frontier; node roles and effort are fixed before workflow start.",
+      "A static workflow never changes roles automatically; escalation requires an explicitly expanded and validated branch in the current design and mapping, or a newly validated design and mapping before another run.",
+      "Every ordinary native launch resolves one explicit task class, posture, semantic role, model, and effort into a policy-bound receipt; parent-model inheritance is forbidden.",
+      "Any exact model id is a refreshable snapshot and must be checked against the authenticated native catalog before pinning or repinning; a static models file or structural receipt is not live authentication."
+    ]
+  },
+  "roles": {
+    "smol": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-5.6-luna",
+      "modelFamily": "gpt-5.6-luna",
+      "effort": "low",
+      "dispatchStatus": "active",
+      "intelligenceClass": "mechanical",
+      "relativeCost": 1
+    },
+    "tiny": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-5.6-luna",
+      "modelFamily": "gpt-5.6-luna",
+      "effort": "low",
+      "dispatchStatus": "active",
+      "intelligenceClass": "mechanical",
+      "relativeCost": 1
+    },
+    "commit": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-5.6-luna",
+      "modelFamily": "gpt-5.6-luna",
+      "effort": "low",
+      "dispatchStatus": "active",
+      "intelligenceClass": "mechanical",
+      "relativeCost": 1
+    },
+    "research_collect": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-5.6-luna",
+      "modelFamily": "gpt-5.6-luna",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "collection",
+      "relativeCost": 2
+    },
+    "research_collect_anthropic": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "anthropic",
+      "model": "claude-sonnet-5",
+      "modelFamily": "claude-sonnet-5",
+      "effort": "high",
+      "dispatchStatus": "active",
+      "intelligenceClass": "collection",
+      "relativeCost": 2
+    },
+    "research_analyze": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-5.6-luna",
+      "modelFamily": "gpt-5.6-luna",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "analysis",
+      "relativeCost": 3
+    },
+    "task": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "analysis",
+      "relativeCost": 7
+    },
+    "frontier_execute": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "topIntelligence",
+      "relativeCost": 7
+    },
+    "frontier_execute_xhigh": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "xhigh",
+      "dispatchStatus": "active",
+      "intelligenceClass": "topIntelligence",
+      "relativeCost": 6
+    },
+    "default": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "xhigh",
+      "dispatchStatus": "active",
+      "intelligenceClass": "analysis",
+      "relativeCost": 6
+    },
+    "vision": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "xhigh",
+      "dispatchStatus": "active",
+      "intelligenceClass": "analysis",
+      "relativeCost": 6
+    },
+    "plan": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "xhigh",
+      "dispatchStatus": "active",
+      "intelligenceClass": "planning",
+      "relativeCost": 6
+    },
+    "designer": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "planning",
+      "relativeCost": 7
+    },
+    "slow": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-5.6-sol",
+      "modelFamily": "gpt-5.6-sol",
+      "effort": "xhigh",
+      "dispatchStatus": "active",
+      "intelligenceClass": "planning",
+      "relativeCost": 6
+    },
+    "anthropic_task": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "anthropic",
+      "model": "claude-sonnet-5",
+      "modelFamily": "claude-sonnet-5",
+      "effort": "high",
+      "dispatchStatus": "active",
+      "intelligenceClass": "analysis",
+      "relativeCost": 4
+    },
+    "frontier_execute_anthropic": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "anthropic",
+      "model": "claude-opus-5",
+      "modelFamily": "claude-opus-5",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "topIntelligence",
+      "relativeCost": 8
+    },
+    "frontier_execute_anthropic_xhigh": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "anthropic",
+      "model": "claude-opus-5",
+      "modelFamily": "claude-opus-5",
+      "effort": "xhigh",
+      "dispatchStatus": "active",
+      "intelligenceClass": "topIntelligence",
+      "relativeCost": 7
+    },
+    "frontier_advice": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "anthropic",
+      "model": "claude-opus-5",
+      "modelFamily": "claude-opus-5",
+      "effort": "max",
+      "effortPolicy": "highest-available",
+      "dispatchStatus": "active",
+      "intelligenceClass": "advice",
+      "relativeCost": 8
+    },
+    "frontier_advice_fable": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "anthropic",
+      "model": "claude-fable-5-1",
+      "modelFamily": "claude-fable-5-1",
+      "effort": "max",
+      "effortPolicy": "highest-available",
+      "dispatchStatus": "active",
+      "intelligenceClass": "advice",
+      "relativeCost": 9
+    },
+    "frontier_advice_astra": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "advice",
+      "relativeCost": 10
+    },
+    "advisor": {
+      "backend": "claude",
+      "provider": "anthropic",
+      "upstreamProviderFamily": "anthropic",
+      "model": "claude-opus-5",
+      "modelFamily": "claude-opus-5",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "verification",
+      "relativeCost": 8
+    },
+    "codex_advisor": {
+      "backend": "codex",
+      "provider": "codex",
+      "upstreamProviderFamily": "openai",
+      "model": "gpt-6-astra",
+      "modelFamily": "gpt-6-astra",
+      "effort": "max",
+      "dispatchStatus": "active",
+      "intelligenceClass": "verification",
+      "relativeCost": 7
+    },
+    "diversity_glm": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "zhipu",
+      "model": "glm-5.2-max",
+      "modelFamily": "glm-5.2",
+      "effort": null,
+      "requiredEffort": "highest-available",
+      "dispatchStatus": "catalog-candidate",
+      "intelligenceClass": "diversity",
+      "relativeCost": 5
+    },
+    "diversity_kimi": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "moonshot",
+      "model": "kimi-k3-max",
+      "modelFamily": "kimi-k3",
+      "effort": null,
+      "requiredEffort": "highest-available",
+      "dispatchStatus": "catalog-candidate",
+      "intelligenceClass": "diversity",
+      "relativeCost": 5
+    },
+    "diversity_grok": {
+      "backend": "cursor",
+      "provider": "cursor",
+      "upstreamProviderFamily": "xai",
+      "model": "grok-4.6",
+      "modelFamily": "grok-4.6",
+      "effort": "xhigh",
+      "effortPolicy": "highest-available",
+      "dispatchStatus": "active",
+      "intelligenceClass": "diversity",
+      "relativeCost": 5
+    }
+  },
+  "routingHeuristics": {
+    "schema": "workflow-model-routing-heuristics/v1",
+    "reference": ".claude/skills/default-mode/references/model-routing-heuristics.md",
+    "runtimeAuthority": "advisory-reference-only-live-resolver-remains-authoritative",
+    "dispatchability": "external-candidates-advisory-until-backend-role-admitted",
+    "modelIdsAre": "refreshable-candidates-until-live-resolution",
+    "lastChecked": "2026-09-11",
+    "harnessGuidance": {
+      "gpt": "codex",
+      "glm": "claude-code",
+      "kimi": "claude-code",
+      "deepseek": "dsh-or-codex"
+    },
+    "activeCandidateIds": {
+      "gpt": ["gpt-5.6-sol", "gpt-6-astra", "gpt-5.6-luna"],
+      "claude": ["claude-opus-5", "claude-sonnet-5", "claude-fable-5"],
+      "glm": ["glm-5.3", "glm-5.3-flash"],
+      "kimi": ["k3"],
+      "deepseek": ["deepseek-flash"],
+      "grok": ["grok-4.6"]
+    },
+    "defaultEffort": "max-or-xhigh",
+    "aliasPolicy": "managed-user-block-only-after-explicit-available-model-declaration"
+  }
+}

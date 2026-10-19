@@ -1,0 +1,6 @@
+# general_agent execpolicy (synced to ~/.codex/rules/ by sync_codex.py).
+# execpolicy is PREFIX-matching over argv — it cannot express path-substring guards, so Codex
+# sessions rely on git history, independent review, and the workflow runner's node-level snapshot
+# audit. These rules are cheap hard-stops for the worst prefixes only.
+prefix_rule(pattern=["git", "push", "--force"], decision="forbidden")
+prefix_rule(pattern=["chmod", "-R", "777"], decision="forbidden")

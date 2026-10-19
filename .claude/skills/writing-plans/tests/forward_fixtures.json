@@ -1,0 +1,50 @@
+[
+  {
+    "id": "diagnose-only-flake",
+    "prompt": "Use $systematic-debugging, $grind, and $writing-plans from the current repository's .claude/skills directory to handle this request: Diagnose why a hypothetical repository test is flaky. I want a root-cause report only—do not edit project files, run experiments, commit, or ask another person. Assume you can inspect logs and run disposable read-only checks. Explain the actions you would take, the artifact you would return, and how you would close your assignment. Do not modify the repository; cite the skill paths that governed your choices.",
+    "mustContain": [
+      "read_only",
+      "root-cause artifact",
+      "no Phase 4 mutation",
+      "no child terminal or memory write"
+    ],
+    "mustNotContain": [
+      "edit project files",
+      "run experiment",
+      "commit",
+      "recursive terminal reviewer"
+    ]
+  },
+  {
+    "id": "analysis-only-rethink-child-scan",
+    "prompt": "Use $rethink-workflow-design and $deep-research-workflow from the current repository's .claude/skills directory to analyze a hypothetical workflow plateau. The user authorizes analysis and web evidence collection only: no repository, board, memory, or external writes and no experiments. Explain how you would use an idea board and a nested evidence scan, what the nested call returns, and who closes the assignment. Do not modify the repository; cite the skill paths that governed your choices.",
+    "mustContain": [
+      "ephemeral board",
+      "child evidence receipt",
+      "activeSkillStack prevents re-entry",
+      "outer terminalOwner closes once"
+    ],
+    "mustNotContain": [
+      "durable board write",
+      "experiment executed",
+      "child terminal verdict",
+      "child memory write"
+    ]
+  },
+  {
+    "id": "proof-cleanup-handoff",
+    "prompt": "Use $proof-rigor and $writeup-human-cleanup from the current repository's .claude/skills directory to describe how you would validate a hypothetical proof and then make its presentation concise. During cleanup you notice a new substantive missing premise. Explain the handoff and review sequence without editing files or solving the proof. Do not modify the repository; cite the skill paths that governed your choices.",
+    "mustContain": [
+      "proof-rigor before cleanup",
+      "NEEDS_PROOF_RIGOR returned to caller",
+      "affected proof checks rerun",
+      "one outer terminal review"
+    ],
+    "mustNotContain": [
+      "cleanup invokes proof-rigor",
+      "mutual recursion",
+      "cleanup silently changes proof substance",
+      "child memory write"
+    ]
+  }
+]

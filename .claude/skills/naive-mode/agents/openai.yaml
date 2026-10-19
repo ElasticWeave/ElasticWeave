@@ -1,0 +1,4 @@
+interface:
+  display_name: "Naive Mode"
+  short_description: "Run an isolated one-shot Codex baseline"
+  default_prompt: "Use $naive-mode to run an isolated one-shot baseline outside this project with a 3600-second native CLI timeout; record whether Simplify -> Verify is required in the temporary review brief, never in project agent instructions. If a slow, high-quality consultation is useful, resolve GPT-6 Astra (gpt-6-astra) live and use xhigh with the full 3600-second timeout; never silently substitute."

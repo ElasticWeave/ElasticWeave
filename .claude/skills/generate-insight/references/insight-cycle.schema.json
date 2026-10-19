@@ -1,0 +1,317 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "insight-cycle.schema.json",
+  "title": "Insight cycle record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "cycleId",
+    "question",
+    "scope",
+    "iterationMode",
+    "state",
+    "budget",
+    "seed",
+    "lemma",
+    "verification",
+    "rounds",
+    "outcome"
+  ],
+  "properties": {
+    "schema": { "const": "insight-cycle/v1" },
+    "cycleId": { "$ref": "#/$defs/nonEmpty" },
+    "question": { "$ref": "#/$defs/nonEmpty" },
+    "scope": { "$ref": "#/$defs/nonEmpty" },
+    "iterationMode": { "enum": ["autonomous", "human_guided"] },
+    "state": {
+      "enum": [
+        "EXPERIMENT_PROPOSED",
+        "LEMMA_PROPOSED",
+        "VERIFYING",
+        "RETHINK",
+        "SOLIDATED",
+        "FAILED"
+      ]
+    },
+    "budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["maxRounds", "maxExperiments", "roundsUsed", "experimentsUsed"],
+      "properties": {
+        "maxRounds": { "type": "integer", "minimum": 1 },
+        "maxExperiments": { "type": "integer", "minimum": 1 },
+        "roundsUsed": { "type": "integer", "minimum": 0 },
+        "experimentsUsed": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "seed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expectedObservation",
+        "actualOperation",
+        "rawObservation",
+        "comparator",
+        "measure",
+        "evidenceRefs"
+      ],
+      "properties": {
+        "expectedObservation": { "$ref": "#/$defs/nonEmpty" },
+        "actualOperation": { "$ref": "#/$defs/nonEmpty" },
+        "rawObservation": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/nonEmpty" }
+          ]
+        },
+        "comparator": { "$ref": "#/$defs/nonEmpty" },
+        "measure": { "$ref": "#/$defs/nonEmpty" },
+        "evidenceRefs": { "$ref": "#/$defs/evidenceRefs" }
+      }
+    },
+    "lemma": {
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "#/$defs/lemma" }
+      ]
+    },
+    "verification": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/experiment" }
+    },
+    "rounds": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["round", "lemma", "experimentId", "result", "discrepancy", "decision"],
+        "properties": {
+          "round": { "type": "integer", "minimum": 1 },
+          "lemma": { "$ref": "#/$defs/lemma" },
+          "experimentId": { "$ref": "#/$defs/nonEmpty" },
+          "result": { "$ref": "#/$defs/result" },
+          "discrepancy": { "$ref": "#/$defs/nonEmpty" },
+          "decision": { "$ref": "#/$defs/nonEmpty" }
+        }
+      }
+    },
+    "outcome": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "terminal",
+            "conclusion",
+            "evidenceRefs",
+            "limitations",
+            "nextProbe",
+            "failureClass"
+          ],
+          "properties": {
+            "terminal": { "enum": ["SOLIDATED", "FAILED"] },
+            "conclusion": { "$ref": "#/$defs/nonEmpty" },
+            "evidenceRefs": { "$ref": "#/$defs/evidenceRefs" },
+            "limitations": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/nonEmpty" }
+            },
+            "nextProbe": { "type": ["string", "null"] },
+            "failureClass": {
+              "enum": [
+                null,
+                "refuted",
+                "inconclusive_budget",
+                "invalid_experiment",
+                "no_discriminating_test",
+                "authority_or_safety",
+                "contradiction_unresolved"
+              ]
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": { "terminal": { "const": "SOLIDATED" } },
+                "required": ["terminal"]
+              },
+              "then": {
+                "properties": { "failureClass": { "type": "null" } }
+              },
+              "else": {
+                "properties": {
+                  "failureClass": {
+                    "type": "string",
+                    "enum": [
+                      "refuted",
+                      "inconclusive_budget",
+                      "invalid_experiment",
+                      "no_discriminating_test",
+                      "authority_or_safety",
+                      "contradiction_unresolved"
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": ["LEMMA_PROPOSED", "VERIFYING", "RETHINK", "SOLIDATED"]
+          }
+        },
+        "required": ["state"]
+      },
+      "then": {
+        "properties": {
+          "seed": {
+            "properties": {
+              "rawObservation": { "$ref": "#/$defs/nonEmpty" },
+              "evidenceRefs": { "$ref": "#/$defs/nonEmptyEvidenceRefs" }
+            }
+          },
+          "lemma": { "$ref": "#/$defs/lemma" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "state": { "const": "SOLIDATED" } },
+        "required": ["state"]
+      },
+      "then": {
+        "properties": {
+          "verification": {
+            "contains": {
+              "properties": { "result": { "const": "SUPPORTS" } },
+              "required": ["result"]
+            },
+            "minContains": 1
+          },
+          "rounds": {
+            "minItems": 1,
+            "contains": {
+              "properties": { "result": { "const": "SUPPORTS" } },
+              "required": ["result"]
+            },
+            "minContains": 1
+          },
+          "outcome": {
+            "type": "object",
+            "properties": {
+              "terminal": { "const": "SOLIDATED" },
+              "evidenceRefs": { "$ref": "#/$defs/nonEmptyEvidenceRefs" },
+              "failureClass": { "type": "null" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "state": { "const": "FAILED" } },
+        "required": ["state"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {
+            "type": "object",
+            "properties": { "terminal": { "const": "FAILED" } }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "state": {
+            "enum": ["EXPERIMENT_PROPOSED", "LEMMA_PROPOSED", "VERIFYING", "RETHINK"]
+          }
+        },
+        "required": ["state"]
+      },
+      "then": {
+        "properties": { "outcome": { "type": "null" } }
+      }
+    }
+  ],
+  "$defs": {
+    "nonEmpty": { "type": "string", "minLength": 1 },
+    "evidenceRefs": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/nonEmpty" },
+      "uniqueItems": true
+    },
+    "nonEmptyEvidenceRefs": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/nonEmpty" },
+      "uniqueItems": true
+    },
+    "result": { "enum": ["SUPPORTS", "REFUTES", "INCONCLUSIVE", "INVALID"] },
+    "lemma": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "statement",
+        "mechanism",
+        "prediction",
+        "competingExplanation",
+        "falsifier",
+        "boundaries"
+      ],
+      "properties": {
+        "statement": { "$ref": "#/$defs/nonEmpty" },
+        "mechanism": { "$ref": "#/$defs/nonEmpty" },
+        "prediction": { "$ref": "#/$defs/nonEmpty" },
+        "competingExplanation": { "$ref": "#/$defs/nonEmpty" },
+        "falsifier": { "$ref": "#/$defs/nonEmpty" },
+        "boundaries": { "$ref": "#/$defs/nonEmpty" }
+      }
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "experimentId",
+        "intervention",
+        "control",
+        "measurement",
+        "decisionRule",
+        "validityRequirements",
+        "stopCondition",
+        "result",
+        "rawEvidenceRefs"
+      ],
+      "properties": {
+        "experimentId": { "$ref": "#/$defs/nonEmpty" },
+        "intervention": { "$ref": "#/$defs/nonEmpty" },
+        "control": { "$ref": "#/$defs/nonEmpty" },
+        "measurement": { "$ref": "#/$defs/nonEmpty" },
+        "decisionRule": { "$ref": "#/$defs/nonEmpty" },
+        "validityRequirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmpty" }
+        },
+        "stopCondition": { "$ref": "#/$defs/nonEmpty" },
+        "result": {
+          "oneOf": [
+            { "type": "null" },
+            { "$ref": "#/$defs/result" }
+          ]
+        },
+        "rawEvidenceRefs": { "$ref": "#/$defs/evidenceRefs" }
+      }
+    }
+  }
+}
